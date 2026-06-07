@@ -653,8 +653,7 @@ app.listen(3000);</div>
 </div>
 
 <script>
-const GROQ_KEY    = sessionStorage.getItem('groqKey') || '';
-const GROQ_URL    = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_URL    = 'https://apex-arena-xbwd.onrender.com/chat/groq';
 const GROQ_MODEL  = 'llama-3.1-8b-instant';
 const STORAGE_KEY = 'apexArena_chatHistory'; // key used to persist chat in localStorage
 
@@ -757,7 +756,6 @@ async function sendMessage() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${GROQ_KEY}`,
       },
       body: JSON.stringify({
         model: GROQ_MODEL,
@@ -789,7 +787,7 @@ async function sendMessage() {
 
   } catch (e) {
     removeTyping(typingId);
-    const errContent = `⚠️ ${e.message}\n\nGet a free Groq key at **console.groq.com** — no credit card needed.`;
+    const errContent = `⚠️ ${e.message}\n\nThe AI assistant is temporarily unavailable. Please try again shortly.`;
     const errMeta    = `Error · ${timeStr()}`;
     messages.push({ role: 'ai', content: errContent, meta: errMeta });
     saveHistory();
