@@ -1,5 +1,5 @@
 // ── API base URL
-var API_BASE = "https://apex-arena-xbwd.onrender.com";
+var API_BASE = "https://apex-arena-backend-production.up.railway.app";
 
 // ── Global state
 var allPlayers = [];
