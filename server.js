@@ -1,42 +1,53 @@
-// backend/server.js
-require('dotenv').config();
-const express  = require('express');
-const cors     = require('cors');
-const connectDB = require('./db');
+// ═══════════════════════════════════════════════════════════
+//  APEX ARENA — server.js  (serves frontend + API from Render)
+// ═══════════════════════════════════════════════════════════
+'use strict';
 
-const app = express();
+const express    = require('express');
+const cors       = require('cors');
+const path       = require('path');
+const connectDB  = require('./db');
 
-// ── Middleware
+const app  = express();
+const PORT = process.env.PORT || 3000;
+
+// ── Connect to MongoDB ──────────────────────────────────────
+connectDB();
+
+// ── Middleware ──────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
 
-// ── Connect to MongoDB
-connectDB();
+// ── API Routes (must come BEFORE static / catch-all) ───────
+const authRoutes          = require('./routes/auth');
+const playerRoutes        = require('./routes/players');
+const registrationRoutes  = require('./routes/registrations');
+const transactionRoutes   = require('./routes/transactions');
+const chatRoutes          = require('./routes/chat');
 
-// ── Routes
-app.use('/auth',          require('./routes/auth'));
-app.use('/players',       require('./routes/players'));
-app.use('/registrations', require('./routes/registrations'));
-app.use('/transactions',  require('./routes/transactions'));
-app.use('/chat',          require('./routes/chat'));
+app.use('/auth',          authRoutes);
+app.use('/players',       playerRoutes);
+app.use('/registrations', registrationRoutes);
+app.use('/transactions',  transactionRoutes);
+app.use('/chat',          chatRoutes);
 
-// ── Health check
-app.get('/', (req, res) => {
+// ── Health-check (optional, keep for Render uptime checks) ──
+app.get('/api/health', (_req, res) => {
   res.json({ message: '🎮 APEX ARENA API running', version: '2.0.0' });
 });
 
-// ── Start
-const PORT = process.env.PORT || 3000;
+// ── Serve Frontend Static Files ─────────────────────────────
+// Place all your HTML / JS / CSS / JSON files in a folder
+// called  "public"  inside the backend directory.
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ── Catch-all: send index.html for any unknown route ────────
+// This makes direct links like /players.html, /login.html etc. work.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// ── Start server ────────────────────────────────────────────
 app.listen(PORT, () => {
-  console.log(`\n✅  Server running on http://localhost:${PORT}`);
-  console.log('   POST /auth/signup');
-  console.log('   POST /auth/login');
-  console.log('   GET  /auth/me');
-  console.log('   GET  /players');
-  console.log('   POST /registrations');
-  console.log('   GET  /registrations/mine');
-  console.log('   GET  /transactions');
-  console.log('   POST /transactions');
-  console.log('   GET  /chat/:sessionId');
-  console.log('   POST /chat');
+  console.log(`🎮 Apex Arena running on port ${PORT}`);
 });
