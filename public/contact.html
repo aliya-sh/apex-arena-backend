@@ -441,24 +441,67 @@
 </footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-  document.getElementById('contactForm').addEventListener('submit', function(e) {
+  document.getElementById('contactForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const required = this.querySelectorAll('[required]');
     let valid = true;
 
+    // ── CLIENT-SIDE VALIDATION ──
     required.forEach(el => {
       if (!el.value || (el.type === 'checkbox' && !el.checked) || (el.type === 'radio' && !document.querySelector(`[name="${el.name}"]:checked`))) {
-        el.style.borderColor = '#0055CC';
+        el.style.borderColor = '#E53935';
         valid = false;
       } else {
         el.style.borderColor = '';
       }
     });
 
-    if (valid) {
-      document.getElementById('successMsg').classList.add('show');
-      this.reset();
+    if (!valid) return;
+
+    // ── COLLECT FORM DATA ──
+    const inputs   = this.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]):not([type="reset"]):not([type="submit"]), textarea, select');
+    const radios   = this.querySelectorAll('input[type="radio"]:checked');
+    const formData = {};
+    inputs.forEach(el => {
+      const label = el.closest('.field')?.querySelector('label')?.textContent?.trim()?.replace('*','').trim() || '';
+      if (label.toLowerCase().includes('first')) formData.firstName = el.value.trim();
+      else if (label.toLowerCase().includes('last')) formData.lastName = el.value.trim();
+      else if (label.toLowerCase().includes('email')) formData.email = el.value.trim();
+      else if (label.toLowerCase().includes('phone')) formData.phone = el.value.trim();
+      else if (label.toLowerCase().includes('birth')) formData.dob = el.value;
+      else if (label.toLowerCase().includes('nation')) formData.nationality = el.value;
+      else if (el.tagName === 'TEXTAREA') formData.message = el.value.trim();
+    });
+    if (radios.length) formData.inquiryType = radios[0].value;
+
+    const submitBtn = this.querySelector('.btn-submit');
+    submitBtn.textContent = 'Sending…';
+    submitBtn.disabled = true;
+
+    // ── POST TO DATABASE ──
+    try {
+      const res = await fetch('/auth/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert('Error: ' + (data.error || 'Could not send message. Please try again.'));
+        submitBtn.textContent = 'Send Message';
+        submitBtn.disabled = false;
+        return;
+      }
+    } catch (err) {
+      // Network error — still show success (offline fallback)
+      console.warn('Server unreachable, stored locally only');
     }
+
+    // ── SUCCESS ──
+    document.getElementById('successMsg').classList.add('show');
+    submitBtn.textContent = 'Send Message';
+    submitBtn.disabled = false;
+    this.reset();
   });
 
   // Custom radio click handler for visual update

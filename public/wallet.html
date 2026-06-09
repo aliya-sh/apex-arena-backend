@@ -1404,7 +1404,7 @@ async function saveTransactionToDB(type, token, amount, usdValue, label) {
   const tok = localStorage.getItem('apexToken');
   if (!tok) return;
   try {
-    await fetch('https://apex-arena-xbwd.onrender.com/transactions', {
+    await fetch('/transactions', {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},
       body: JSON.stringify({type,token,amount,usdValue,label}),
@@ -1416,7 +1416,7 @@ async function loadTransactionsFromDB() {
   const tok = localStorage.getItem('apexToken');
   if (!tok) return;
   try {
-    const res = await fetch('https://apex-arena-xbwd.onrender.com/transactions',{headers:{'Authorization':'Bearer '+tok}});
+    const res = await fetch('/transactions',{headers:{'Authorization':'Bearer '+tok}});
     if (!res.ok) return;
     const txs = await res.json();
     txs.forEach(tx => {

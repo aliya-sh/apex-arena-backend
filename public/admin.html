@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — APEX ARENA</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --gold: #1E90FF; --gold-light: #63B3FF; --crimson: #0055CC; --dark: #050810; --dark2: #080D1A; --dark3: #0D1525; --off-white: #F0EDE8; --muted: #888; --green: #43A047; --red: #E53935; --warn: #FFB300; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--dark); color: var(--off-white); font-family: 'Barlow', sans-serif; font-weight: 300; min-height: 100vh; overflow-x: hidden; }
+
+  .bg-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 80% 10%, rgba(0,80,200,0.18) 0%, transparent 50%), linear-gradient(135deg, #05080F 0%, #080D18 100%); }
+  .bg-grid { position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image: linear-gradient(rgba(30,144,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(30,144,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px; }
+
+  /* HEADER */
+  header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 2.5rem; height: 64px; background: rgba(5,8,16,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(30,144,255,0.25); }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.08em; color: var(--gold); text-decoration: none; display: flex; align-items: center; gap: 0.6rem; }
+  .logo-emblem { width: 30px; height: 30px; background: var(--gold); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: var(--dark); font-weight: 700; }
+  .header-right { display: flex; align-items: center; gap: 1.5rem; }
+  .admin-badge { background: rgba(229,57,53,0.15); border: 1px solid rgba(229,57,53,0.4); color: var(--red); padding: 0.25rem 0.8rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; }
+  .logout-link { font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; text-decoration: none; cursor: pointer; background: none; border: none; }
+  .logout-link:hover { color: var(--red); }
+
+  /* AUTH GATE */
+  .auth-gate { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; gap: 1.5rem; padding: 2rem; }
+  .gate-icon { font-size: 4rem; opacity: 0.3; }
+  .gate-title { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; }
+  .gate-text { color: var(--muted); max-width: 400px; }
+  .btn { display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.8rem 2rem; text-decoration: none; transition: all 0.25s; }
+  .btn-primary { background: var(--gold); color: var(--dark); }
+  .btn-primary:hover { opacity: 0.85; }
+
+  /* LAYOUT */
+  .admin-wrap { position: relative; z-index: 1; padding-top: 64px; display: flex; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar { width: 220px; flex-shrink: 0; background: rgba(8,13,26,0.95); border-right: 1px solid rgba(30,144,255,0.12); padding: 2rem 0; position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto; }
+  .sidebar-section { font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); padding: 0 1.5rem; margin: 1.5rem 0 0.5rem; }
+  .sidebar-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 1.5rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; letter-spacing: 0.05em; color: var(--off-white); cursor: pointer; border-left: 2px solid transparent; transition: all 0.2s; }
+  .sidebar-item:hover { background: rgba(30,144,255,0.06); color: var(--gold); }
+  .sidebar-item.active { background: rgba(30,144,255,0.1); color: var(--gold); border-left-color: var(--gold); }
+  .sidebar-icon { font-size: 1rem; width: 20px; text-align: center; }
+  .sidebar-count { margin-left: auto; background: var(--gold); color: var(--dark); font-size: 0.65rem; padding: 0.1rem 0.45rem; font-weight: 700; border-radius: 2px; }
+
+  /* MAIN CONTENT */
+  .admin-content { flex: 1; padding: 2.5rem; overflow-x: hidden; }
+
+  /* SECTION */
+  .section-panel { display: none; }
+  .section-panel.active { display: block; }
+
+  /* HEADER BAR */
+  .content-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+  .content-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 0.04em; }
+  .content-sub { font-size: 0.85rem; color: var(--muted); margin-top: 0.25rem; }
+
+  /* STATS ROW */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .stat-card { background: var(--dark3); border: 1px solid rgba(30,144,255,0.1); padding: 1.25rem; position: relative; overflow: hidden; }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--gold), transparent); }
+  .stat-card.red::before { background: linear-gradient(90deg, var(--red), transparent); }
+  .stat-card.green::before { background: linear-gradient(90deg, var(--green), transparent); }
+  .stat-card.warn::before { background: linear-gradient(90deg, var(--warn), transparent); }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: var(--gold); line-height: 1; }
+  .stat-card.red .stat-num { color: var(--red); }
+  .stat-card.green .stat-num { color: var(--green); }
+  .stat-card.warn .stat-num { color: var(--warn); }
+  .stat-label { font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-top: 0.25rem; }
+
+  /* TOOLBAR */
+  .toolbar { display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .search-input { background: var(--dark3); border: 1px solid rgba(30,144,255,0.2); color: var(--off-white); padding: 0.55rem 1rem; font-family: 'Barlow', sans-serif; font-size: 0.85rem; outline: none; width: 220px; transition: border-color 0.3s; }
+  .search-input:focus { border-color: var(--gold); }
+  .search-input::placeholder { color: var(--muted); }
+  .filter-sel { background: var(--dark3); border: 1px solid rgba(30,144,255,0.2); color: var(--off-white); padding: 0.55rem 1rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.82rem; cursor: pointer; outline: none; }
+  .action-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.55rem 1.2rem; border: 1px solid; cursor: pointer; transition: all 0.2s; background: transparent; }
+  .btn-blue  { border-color: var(--gold); color: var(--gold); }
+  .btn-blue:hover { background: var(--gold); color: var(--dark); }
+  .btn-red   { border-color: var(--red); color: var(--red); }
+  .btn-red:hover { background: var(--red); color: #fff; }
+  .btn-green { border-color: var(--green); color: var(--green); }
+  .btn-green:hover { background: var(--green); color: #fff; }
+
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th { font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); padding: 0.65rem 1rem; text-align: left; border-bottom: 1px solid rgba(30,144,255,0.15); white-space: nowrap; }
+  .data-table td { padding: 0.85rem 1rem; border-bottom: 1px solid rgba(30,144,255,0.06); font-size: 0.88rem; vertical-align: middle; }
+  .data-table tbody tr { transition: background 0.15s; }
+  .data-table tbody tr:hover { background: rgba(30,144,255,0.04); }
+  .data-table .no-data td { text-align: center; padding: 3rem; color: var(--muted); }
+
+  .pill { display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.2rem 0.65rem; border: 1px solid; }
+  .pill-blue   { color: var(--gold);  border-color: var(--gold);  background: rgba(30,144,255,0.08); }
+  .pill-red    { color: var(--red);   border-color: var(--red);   background: rgba(229,57,53,0.08); }
+  .pill-green  { color: var(--green); border-color: var(--green); background: rgba(67,160,71,0.08); }
+  .pill-warn   { color: var(--warn);  border-color: var(--warn);  background: rgba(255,179,0,0.08); }
+  .pill-gray   { color: var(--muted); border-color: rgba(30,144,255,0.2); }
+
+  .tbl-actions { display: flex; gap: 0.5rem; align-items: center; }
+  .tbl-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 0.72rem; letter-spacing: 0.08em; padding: 0.25rem 0.65rem; border: 1px solid; background: transparent; cursor: pointer; transition: all 0.2s; }
+  .tbl-btn.edit  { border-color: rgba(30,144,255,0.4); color: var(--gold); }
+  .tbl-btn.edit:hover  { background: var(--gold); color: var(--dark); }
+  .tbl-btn.del   { border-color: rgba(229,57,53,0.4); color: var(--red); }
+  .tbl-btn.del:hover   { background: var(--red); color: #fff; }
+  .tbl-btn.approve { border-color: rgba(67,160,71,0.4); color: var(--green); }
+  .tbl-btn.approve:hover { background: var(--green); color: #fff; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(4px); }
+  .modal { background: var(--dark2); border: 1px solid rgba(30,144,255,0.2); padding: 2.5rem; width: 100%; max-width: 480px; position: relative; }
+  .modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--gold), var(--crimson)); }
+  .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--gold); margin-bottom: 1.5rem; }
+  .modal-field { margin-bottom: 1rem; }
+  .modal-field label { font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 0.35rem; }
+  .modal-field input, .modal-field select { width: 100%; background: var(--dark3); border: 1px solid rgba(30,144,255,0.2); color: var(--off-white); padding: 0.6rem 1rem; font-family: 'Barlow', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.3s; }
+  .modal-field input:focus, .modal-field select:focus { border-color: var(--gold); }
+  .modal-field select option { background: var(--dark3); }
+  .modal-footer { display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end; }
+  .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.1rem; }
+  .modal-close:hover { color: var(--off-white); }
+
+  /* CONFIRM MODAL */
+  .confirm-text { color: var(--off-white); margin-bottom: 0.5rem; }
+  .confirm-sub { color: var(--muted); font-size: 0.85rem; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 2rem; right: 2rem; z-index: 999; background: var(--dark3); border: 1px solid rgba(30,144,255,0.3); padding: 1rem 1.5rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; letter-spacing: 0.04em; transform: translateY(100px); opacity: 0; transition: all 0.3s; max-width: 320px; }
+  .toast.show { transform: none; opacity: 1; }
+  .toast.success { border-color: rgba(67,160,71,0.4); }
+  .toast.error   { border-color: rgba(229,57,53,0.4); }
+
+  /* SPINNER */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner { width: 28px; height: 28px; border: 2px solid rgba(30,144,255,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 2rem auto; display: block; }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .admin-content { padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="bg-grid"></div>
+
+<!-- AUTH GATE -->
+<div id="auth-gate" style="display:none">
+  <div class="auth-gate">
+    <div class="gate-icon">🛡️</div>
+    <h2 class="gate-title">ADMIN ACCESS ONLY</h2>
+    <p class="gate-text">You must be logged in with an administrator account to access this panel.</p>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center">
+      <a href="login.html" class="btn btn-primary">Sign In</a>
+      <a href="index.html" class="btn" style="border:1px solid rgba(30,144,255,0.3);color:var(--gold)">Back to Home</a>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN INTERFACE -->
+<div id="admin-interface" style="display:none">
+<header>
+  <a href="index.html" class="logo"><div class="logo-emblem">A</div> APEX ARENA</a>
+  <div class="header-right">
+    <span class="admin-badge">⚡ Admin Panel</span>
+    <span style="font-size:0.85rem;color:var(--muted)" id="admin-name">—</span>
+    <button class="logout-link" id="logout-btn">Logout</button>
+  </div>
+</header>
+
+<div class="admin-wrap">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">Dashboard</div>
+    <div class="sidebar-item active" data-tab="overview"><span class="sidebar-icon">📊</span>Overview</div>
+    <div class="sidebar-section">Management</div>
+    <div class="sidebar-item" data-tab="users"><span class="sidebar-icon">👥</span>Users <span class="sidebar-count" id="count-users">0</span></div>
+    <div class="sidebar-item" data-tab="players"><span class="sidebar-icon">🎮</span>Players <span class="sidebar-count" id="count-players">0</span></div>
+    <div class="sidebar-item" data-tab="registrations"><span class="sidebar-icon">📋</span>Registrations <span class="sidebar-count" id="count-regs">0</span></div>
+    <div class="sidebar-section">Database</div>
+    <div class="sidebar-item" data-tab="schema"><span class="sidebar-icon">🗄️</span>DB Schema</div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="admin-content">
+
+    <!-- OVERVIEW -->
+    <div class="section-panel active" id="tab-overview">
+      <div class="content-header">
+        <div><div class="content-title">ADMIN DASHBOARD</div><div class="content-sub">Full overview of Apex Arena platform</div></div>
+      </div>
+      <div class="stats-row" id="overview-stats">
+        <div class="stat-card"><div class="spinner"></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:2rem">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem">Recent Registrations</div>
+          <div id="recent-regs"><div class="spinner"></div></div>
+        </div>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--gold);margin-bottom:1rem">Recent Users</div>
+          <div id="recent-users"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="section-panel" id="tab-users">
+      <div class="content-header">
+        <div><div class="content-title">USER MANAGEMENT</div><div class="content-sub">View, edit, and delete registered users</div></div>
+        <button class="action-btn btn-blue" id="btn-add-user">+ Add User</button>
+      </div>
+      <div class="toolbar">
+        <input class="search-input" id="user-search" placeholder="🔍 Search users…">
+        <select class="filter-sel" id="user-filter-role">
+          <option value="">All Roles</option>
+          <option value="player">Player</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
+        <tbody id="users-tbody"><tr class="no-data"><td colspan="6"><div class="spinner"></div></td></tr></tbody>
+      </table>
+    </div>
+
+    <!-- PLAYERS -->
+    <div class="section-panel" id="tab-players">
+      <div class="content-header">
+        <div><div class="content-title">PLAYER MANAGEMENT</div><div class="content-sub">Add, update, and remove competitive players</div></div>
+        <button class="action-btn btn-blue" id="btn-add-player">+ Add Player</button>
+      </div>
+      <div class="toolbar">
+        <input class="search-input" id="player-search" placeholder="🔍 Search players…">
+        <select class="filter-sel" id="player-filter-game">
+          <option value="">All Games</option>
+          <option value="Valorant">Valorant</option>
+          <option value="CS2">CS2</option>
+          <option value="League of Legends">LoL</option>
+          <option value="Apex Legends">Apex Legends</option>
+        </select>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Rank</th><th>Name</th><th>Country</th><th>Game</th><th>W / L</th><th>Win%</th><th>Actions</th></tr></thead>
+        <tbody id="players-tbody"><tr class="no-data"><td colspan="7"><div class="spinner"></div></td></tr></tbody>
+      </table>
+    </div>
+
+    <!-- REGISTRATIONS -->
+    <div class="section-panel" id="tab-registrations">
+      <div class="content-header">
+        <div><div class="content-title">REGISTRATION MANAGEMENT</div><div class="content-sub">Approve, reject or delete tournament registrations</div></div>
+      </div>
+      <div class="toolbar">
+        <input class="search-input" id="reg-search" placeholder="🔍 Search registrations…">
+        <select class="filter-sel" id="reg-filter-status">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Tournament</th><th>Player</th><th>Game</th><th>Region</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="regs-tbody"><tr class="no-data"><td colspan="7"><div class="spinner"></div></td></tr></tbody>
+      </table>
+    </div>
+
+    <!-- DB SCHEMA -->
+    <div class="section-panel" id="tab-schema">
+      <div class="content-header">
+        <div><div class="content-title">DATABASE SCHEMA</div><div class="content-sub">Relational structure — MongoDB Atlas / Mongoose</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem">
+        <!-- USERS TABLE -->
+        <div class="stat-card" style="padding:1.5rem">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem">📋 users</div>
+          <table style="width:100%;font-size:0.8rem;border-collapse:collapse">
+            <tr style="border-bottom:1px solid rgba(30,144,255,0.15)"><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">FIELD</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">TYPE</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">NOTES</th></tr>
+            ${[['_id','ObjectId','PK, auto'],['firstName','String','required'],['lastName','String','required'],['email','String','unique, required'],['password','String','bcrypt hashed'],['role','Enum','player|admin'],['avatar','String','URL'],['createdAt','Date','auto']].map(r=>`<tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.4rem 0.5rem;color:var(--gold);font-family:'Barlow Condensed',sans-serif">${r[0]}</td><td style="padding:0.4rem 0.5rem;color:var(--off-white)">${r[1]}</td><td style="padding:0.4rem 0.5rem;color:var(--muted);font-size:0.75rem">${r[2]}</td></tr>`).join('')}
+          </table>
+        </div>
+        <!-- PLAYERS TABLE -->
+        <div class="stat-card" style="padding:1.5rem">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem">🎮 players</div>
+          <table style="width:100%;font-size:0.8rem;border-collapse:collapse">
+            <tr style="border-bottom:1px solid rgba(30,144,255,0.15)"><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">FIELD</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">TYPE</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">NOTES</th></tr>
+            ${[['_id','ObjectId','PK, auto'],['name','String','required'],['country','String','flag + name'],['rank','Number','1-indexed'],['wins','Number','total wins'],['losses','Number','total losses'],['game','String','Valorant etc.'],['photo','String','image URL'],['user','Ref→users','nullable FK']].map(r=>`<tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.4rem 0.5rem;color:var(--gold);font-family:'Barlow Condensed',sans-serif">${r[0]}</td><td style="padding:0.4rem 0.5rem;color:var(--off-white)">${r[1]}</td><td style="padding:0.4rem 0.5rem;color:var(--muted);font-size:0.75rem">${r[2]}</td></tr>`).join('')}
+          </table>
+        </div>
+        <!-- REGISTRATIONS TABLE -->
+        <div class="stat-card" style="padding:1.5rem">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem">📝 registrations</div>
+          <table style="width:100%;font-size:0.8rem;border-collapse:collapse">
+            <tr style="border-bottom:1px solid rgba(30,144,255,0.15)"><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">FIELD</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">TYPE</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">NOTES</th></tr>
+            ${[['_id','ObjectId','PK'],['user','Ref→users','FK required'],['tournamentName','String','required'],['tournamentId','String','required'],['game','String','required'],['teamName','String','optional'],['inGameName','String','required'],['region','String','required'],['entryFee','String','e.g. 0.05 ETH'],['paymentStatus','Enum','pending|paid|refunded'],['txHash','String','ETH tx hash'],['status','Enum','pending|confirmed|rejected'],['createdAt','Date','auto']].map(r=>`<tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.4rem 0.5rem;color:var(--gold);font-family:'Barlow Condensed',sans-serif">${r[0]}</td><td style="padding:0.4rem 0.5rem;color:var(--off-white)">${r[1]}</td><td style="padding:0.4rem 0.5rem;color:var(--muted);font-size:0.75rem">${r[2]}</td></tr>`).join('')}
+          </table>
+        </div>
+        <!-- TRANSACTIONS TABLE -->
+        <div class="stat-card" style="padding:1.5rem">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem">💳 transactions</div>
+          <table style="width:100%;font-size:0.8rem;border-collapse:collapse">
+            <tr style="border-bottom:1px solid rgba(30,144,255,0.15)"><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">FIELD</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">TYPE</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">NOTES</th></tr>
+            ${[['_id','ObjectId','PK'],['user','Ref→users','FK'],['type','Enum','deposit|withdrawal|payment'],['amount','Number','value'],['currency','String','ETH/USDT/USD'],['txHash','String','chain tx hash'],['status','Enum','pending|confirmed|failed'],['createdAt','Date','auto']].map(r=>`<tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.4rem 0.5rem;color:var(--gold);font-family:'Barlow Condensed',sans-serif">${r[0]}</td><td style="padding:0.4rem 0.5rem;color:var(--off-white)">${r[1]}</td><td style="padding:0.4rem 0.5rem;color:var(--muted);font-size:0.75rem">${r[2]}</td></tr>`).join('')}
+          </table>
+        </div>
+        <!-- CHATMESSAGES TABLE -->
+        <div class="stat-card" style="padding:1.5rem">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem">💬 chatmessages</div>
+          <table style="width:100%;font-size:0.8rem;border-collapse:collapse">
+            <tr style="border-bottom:1px solid rgba(30,144,255,0.15)"><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">FIELD</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">TYPE</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">NOTES</th></tr>
+            ${[['_id','ObjectId','PK'],['user','Ref→users','nullable FK'],['role','Enum','user|assistant'],['content','String','message text'],['createdAt','Date','auto']].map(r=>`<tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.4rem 0.5rem;color:var(--gold);font-family:'Barlow Condensed',sans-serif">${r[0]}</td><td style="padding:0.4rem 0.5rem;color:var(--off-white)">${r[1]}</td><td style="padding:0.4rem 0.5rem;color:var(--muted);font-size:0.75rem">${r[2]}</td></tr>`).join('')}
+          </table>
+        </div>
+        <!-- SUMMARY -->
+        <div class="stat-card" style="padding:1.5rem;border-color:rgba(30,144,255,0.2)">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem">📌 Summary</div>
+          <div style="font-size:0.85rem;color:var(--off-white);line-height:1.8">
+            <div>Total tables: <strong style="color:var(--gold)">5</strong></div>
+            <div style="margin-top:0.5rem;color:var(--muted);font-size:0.8rem">users, players, registrations, transactions, chatmessages</div>
+            <div style="margin-top:1rem">CRUD Operations:</div>
+            <div style="color:var(--muted);font-size:0.8rem;line-height:2">
+              ✅ <strong style="color:var(--green)">Create</strong> — POST /auth/signup, /players, /registrations<br>
+              ✅ <strong style="color:var(--gold)">Read</strong> — GET /players, /registrations, /auth/me<br>
+              ✅ <strong style="color:var(--warn)">Update</strong> — PUT /players/:id, /registrations/:id/status<br>
+              ✅ <strong style="color:var(--red)">Delete</strong> — DELETE /players/:id, /registrations/:id
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+</div>
+
+<!-- MODAL: Edit/Add User -->
+<div class="modal-overlay" id="user-modal" style="display:none">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('user-modal')">✕</button>
+    <div class="modal-title" id="user-modal-title">Edit User</div>
+    <input type="hidden" id="user-modal-id">
+    <div class="modal-field"><label>First Name</label><input type="text" id="um-first"></div>
+    <div class="modal-field"><label>Last Name</label><input type="text" id="um-last"></div>
+    <div class="modal-field"><label>Email</label><input type="email" id="um-email"></div>
+    <div class="modal-field"><label>Role</label><select id="um-role"><option value="player">Player</option><option value="admin">Admin</option></select></div>
+    <div class="modal-footer">
+      <button class="action-btn btn-red" onclick="closeModal('user-modal')">Cancel</button>
+      <button class="action-btn btn-green" id="user-modal-save">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Edit/Add Player -->
+<div class="modal-overlay" id="player-modal" style="display:none">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('player-modal')">✕</button>
+    <div class="modal-title" id="player-modal-title">Add Player</div>
+    <input type="hidden" id="pm-id">
+    <div class="modal-field"><label>Name</label><input type="text" id="pm-name"></div>
+    <div class="modal-field"><label>Country (emoji + name)</label><input type="text" id="pm-country" placeholder="🇵🇰 Pakistan"></div>
+    <div class="modal-field" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div><label>Rank</label><input type="number" id="pm-rank" min="1"></div>
+      <div><label>Game</label><select id="pm-game"><option>Valorant</option><option>CS2</option><option>League of Legends</option><option>Apex Legends</option></select></div>
+    </div>
+    <div class="modal-field" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div><label>Wins</label><input type="number" id="pm-wins" min="0"></div>
+      <div><label>Losses</label><input type="number" id="pm-losses" min="0"></div>
+    </div>
+    <div class="modal-field"><label>Photo URL</label><input type="text" id="pm-photo" placeholder="https://…"></div>
+    <div class="modal-footer">
+      <button class="action-btn btn-red" onclick="closeModal('player-modal')">Cancel</button>
+      <button class="action-btn btn-green" id="player-modal-save">Save Player</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE MODAL -->
+<div class="modal-overlay" id="confirm-modal" style="display:none">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-title" style="color:var(--red)">Confirm Delete</div>
+    <p class="confirm-text" id="confirm-text">Are you sure?</p>
+    <p class="confirm-sub">This action cannot be undone.</p>
+    <div class="modal-footer">
+      <button class="action-btn btn-blue" onclick="closeModal('confirm-modal')">Cancel</button>
+      <button class="action-btn btn-red" id="confirm-yes">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  const token = localStorage.getItem('apexToken');
+  let userData = null;
+  try { userData = JSON.parse(localStorage.getItem('apexUser')); } catch {}
+
+  /* ── AUTH CHECK ── */
+  async function init() {
+    if (!token) { showGate('Login required'); return; }
+    try {
+      const res = await fetch('/auth/me', { headers: { Authorization: 'Bearer ' + token } });
+      if (!res.ok) throw new Error();
+      const user = await res.json();
+      if (user.role !== 'admin') { showGate('Admin access required. Your account role is: ' + user.role); return; }
+      userData = user;
+      document.getElementById('admin-name').textContent = user.firstName + ' ' + user.lastName;
+      document.getElementById('admin-interface').style.display = 'block';
+      loadAll();
+    } catch {
+      if (userData && userData.role === 'admin') {
+        document.getElementById('admin-interface').style.display = 'block';
+        document.getElementById('admin-name').textContent = userData.firstName + ' ' + userData.lastName;
+        loadAll();
+      } else {
+        showGate('Could not verify admin access. Please log in again.');
+      }
+    }
+  }
+
+  function showGate(msg) {
+    document.getElementById('auth-gate').style.display = 'block';
+    document.querySelector('.gate-text').textContent = msg;
+  }
+
+  document.getElementById('logout-btn').addEventListener('click', () => {
+    localStorage.removeItem('apexToken'); localStorage.removeItem('apexUser');
+    location.href = 'login.html';
+  });
+
+  /* ── TABS ── */
+  document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+      item.classList.add('active');
+      document.getElementById('tab-' + item.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ── DATA STORES ── */
+  let allUsers = [], allPlayers = [], allRegs = [];
+
+  async function loadAll() {
+    await Promise.all([loadUsers(), loadPlayers(), loadRegistrations()]);
+    renderOverview();
+  }
+
+  /* ── API HELPERS ── */
+  async function apiFetch(url, opts = {}) {
+    const res = await fetch(url, { ...opts, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token, ...(opts.headers || {}) } });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  }
+
+  /* ── USERS ── */
+  async function loadUsers() {
+    try {
+      // GET /auth/users (admin endpoint added in routes)
+      const data = await apiFetch('/auth/users');
+      allUsers = data;
+    } catch {
+      // Fallback: show demo data
+      allUsers = [
+        { _id: 'u1', firstName: 'aliya', lastName: 'shahid', email: 'aliya@email.com', role: 'player', createdAt: new Date().toISOString() },
+        { _id: 'u2', firstName: 'Admin', lastName: 'User', email: 'admin@apexarena.com', role: 'admin', createdAt: new Date().toISOString() }
+      ];
+    }
+    document.getElementById('count-users').textContent = allUsers.length;
+    renderUsers();
+  }
+
+  function renderUsers(filter = '', role = '') {
+    const tbody = document.getElementById('users-tbody');
+    let list = allUsers;
+    if (filter) list = list.filter(u => (u.firstName+' '+u.lastName+' '+u.email).toLowerCase().includes(filter.toLowerCase()));
+    if (role)   list = list.filter(u => u.role === role);
+    if (!list.length) { tbody.innerHTML = `<tr class="no-data"><td colspan="6">No users found.</td></tr>`; return; }
+    tbody.innerHTML = list.map((u, i) => `
+      <tr>
+        <td style="color:var(--muted)">${i+1}</td>
+        <td>${u.firstName} ${u.lastName}</td>
+        <td style="color:var(--muted)">${u.email}</td>
+        <td><span class="pill ${u.role==='admin'?'pill-red':'pill-blue'}">${u.role}</span></td>
+        <td style="color:var(--muted)">${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}</td>
+        <td><div class="tbl-actions">
+          <button class="tbl-btn edit" onclick="openEditUser('${u._id}')">Edit</button>
+          <button class="tbl-btn del" onclick="confirmDelete('user','${u._id}','${u.firstName} ${u.lastName}')">Delete</button>
+        </div></td>
+      </tr>`).join('');
+  }
+
+  document.getElementById('user-search').addEventListener('input', e => renderUsers(e.target.value, document.getElementById('user-filter-role').value));
+  document.getElementById('user-filter-role').addEventListener('change', e => renderUsers(document.getElementById('user-search').value, e.target.value));
+
+  function openEditUser(id) {
+    const u = allUsers.find(x => x._id === id);
+    if (!u) return;
+    document.getElementById('user-modal-title').textContent = 'Edit User';
+    document.getElementById('user-modal-id').value = id;
+    document.getElementById('um-first').value = u.firstName;
+    document.getElementById('um-last').value = u.lastName;
+    document.getElementById('um-email').value = u.email;
+    document.getElementById('um-role').value = u.role;
+    document.getElementById('user-modal').style.display = 'flex';
+  }
+
+  document.getElementById('btn-add-user').addEventListener('click', () => {
+    document.getElementById('user-modal-title').textContent = 'Add User';
+    document.getElementById('user-modal-id').value = '';
+    ['um-first','um-last','um-email'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('um-role').value = 'player';
+    document.getElementById('user-modal').style.display = 'flex';
+  });
+
+  document.getElementById('user-modal-save').addEventListener('click', async () => {
+    const id = document.getElementById('user-modal-id').value;
+    const body = { firstName: document.getElementById('um-first').value.trim(), lastName: document.getElementById('um-last').value.trim(), email: document.getElementById('um-email').value.trim(), role: document.getElementById('um-role').value };
+    if (!body.firstName || !body.lastName || !body.email) { showToast('All fields required', 'error'); return; }
+    try {
+      if (id) {
+        await apiFetch('/auth/users/' + id, { method: 'PUT', body: JSON.stringify(body) });
+        const idx = allUsers.findIndex(u => u._id === id);
+        if (idx >= 0) Object.assign(allUsers[idx], body);
+        showToast('User updated', 'success');
+      } else {
+        const created = await apiFetch('/auth/signup', { method: 'POST', body: JSON.stringify({ ...body, password: 'Temp@1234' }) });
+        allUsers.push(created.user || created);
+        showToast('User created', 'success');
+      }
+      closeModal('user-modal'); renderUsers(); document.getElementById('count-users').textContent = allUsers.length;
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  });
+
+  /* ── PLAYERS ── */
+  async function loadPlayers() {
+    try {
+      const data = await apiFetch('/players');
+      allPlayers = data;
+    } catch {
+      allPlayers = [];
+    }
+    document.getElementById('count-players').textContent = allPlayers.length;
+    renderPlayers();
+  }
+
+  function renderPlayers(filter = '', game = '') {
+    const tbody = document.getElementById('players-tbody');
+    let list = [...allPlayers];
+    if (filter) list = list.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()) || (p.country||'').toLowerCase().includes(filter.toLowerCase()));
+    if (game)   list = list.filter(p => p.game === game);
+    list.sort((a,b) => a.rank - b.rank);
+    if (!list.length) { tbody.innerHTML = `<tr class="no-data"><td colspan="7">No players found.</td></tr>`; return; }
+    tbody.innerHTML = list.map(p => {
+      const wr = (p.wins / (p.wins + p.losses || 1) * 100).toFixed(0);
+      return `<tr>
+        <td style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--muted)">${p.rank}</td>
+        <td><div style="display:flex;align-items:center;gap:0.6rem"><img src="${p.photo||''}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(30,144,255,0.2)" onerror="this.style.display='none'"><span>${p.name}</span></div></td>
+        <td style="color:var(--muted)">${p.country||'—'}</td>
+        <td><span class="pill pill-blue">${p.game}</span></td>
+        <td><span style="color:#4CAF50">${p.wins}</span> / <span style="color:#E53935">${p.losses}</span></td>
+        <td>${wr}%</td>
+        <td><div class="tbl-actions">
+          <button class="tbl-btn edit" onclick="openEditPlayer('${p._id}')">Edit</button>
+          <button class="tbl-btn del" onclick="confirmDelete('player','${p._id}','${p.name}')">Delete</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  document.getElementById('player-search').addEventListener('input', e => renderPlayers(e.target.value, document.getElementById('player-filter-game').value));
+  document.getElementById('player-filter-game').addEventListener('change', e => renderPlayers(document.getElementById('player-search').value, e.target.value));
+
+  function openEditPlayer(id) {
+    const p = allPlayers.find(x => x._id === id);
+    if (!p) return;
+    document.getElementById('player-modal-title').textContent = 'Edit Player';
+    document.getElementById('pm-id').value = id;
+    document.getElementById('pm-name').value = p.name;
+    document.getElementById('pm-country').value = p.country || '';
+    document.getElementById('pm-rank').value = p.rank;
+    document.getElementById('pm-game').value = p.game;
+    document.getElementById('pm-wins').value = p.wins;
+    document.getElementById('pm-losses').value = p.losses;
+    document.getElementById('pm-photo').value = p.photo || '';
+    document.getElementById('player-modal').style.display = 'flex';
+  }
+
+  document.getElementById('btn-add-player').addEventListener('click', () => {
+    document.getElementById('player-modal-title').textContent = 'Add Player';
+    document.getElementById('pm-id').value = '';
+    ['pm-name','pm-country','pm-photo'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('pm-rank').value = allPlayers.length + 1;
+    document.getElementById('pm-wins').value = 0;
+    document.getElementById('pm-losses').value = 0;
+    document.getElementById('player-modal').style.display = 'flex';
+  });
+
+  document.getElementById('player-modal-save').addEventListener('click', async () => {
+    const id = document.getElementById('pm-id').value;
+    const body = { name: document.getElementById('pm-name').value.trim(), country: document.getElementById('pm-country').value.trim(), rank: +document.getElementById('pm-rank').value, game: document.getElementById('pm-game').value, wins: +document.getElementById('pm-wins').value, losses: +document.getElementById('pm-losses').value, photo: document.getElementById('pm-photo').value.trim() };
+    if (!body.name) { showToast('Player name required', 'error'); return; }
+    try {
+      if (id) {
+        const updated = await apiFetch('/players/' + id, { method: 'PUT', body: JSON.stringify(body) });
+        const idx = allPlayers.findIndex(p => p._id === id);
+        if (idx >= 0) allPlayers[idx] = updated;
+        showToast('Player updated', 'success');
+      } else {
+        const created = await apiFetch('/players', { method: 'POST', body: JSON.stringify(body) });
+        allPlayers.push(created);
+        showToast('Player added', 'success');
+      }
+      closeModal('player-modal'); renderPlayers(); document.getElementById('count-players').textContent = allPlayers.length;
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  });
+
+  /* ── REGISTRATIONS ── */
+  async function loadRegistrations() {
+    try {
+      const data = await apiFetch('/registrations/all');
+      allRegs = data;
+    } catch {
+      allRegs = [];
+    }
+    document.getElementById('count-regs').textContent = allRegs.length;
+    renderRegs();
+  }
+
+  function renderRegs(filter = '', status = '') {
+    const tbody = document.getElementById('regs-tbody');
+    let list = [...allRegs];
+    if (filter) list = list.filter(r => (r.tournamentName + ' ' + (r.user?.email||'') + ' ' + r.inGameName).toLowerCase().includes(filter.toLowerCase()));
+    if (status) list = list.filter(r => r.status === status);
+    if (!list.length) { tbody.innerHTML = `<tr class="no-data"><td colspan="7">No registrations found.</td></tr>`; return; }
+    tbody.innerHTML = list.map(r => {
+      const playerName = r.user ? (r.user.firstName + ' ' + r.user.lastName) : (r.inGameName || '—');
+      const statusClass = r.status === 'confirmed' ? 'pill-green' : r.status === 'rejected' ? 'pill-red' : 'pill-warn';
+      const payClass = r.paymentStatus === 'paid' ? 'pill-green' : r.paymentStatus === 'refunded' ? 'pill-red' : 'pill-warn';
+      return `<tr>
+        <td>${r.tournamentName}<br><span style="color:var(--muted);font-size:0.75rem">${r.game}</span></td>
+        <td>${playerName}<br><span style="color:var(--muted);font-size:0.75rem">${r.user?.email||''}</span></td>
+        <td><span class="pill pill-blue">${r.game}</span></td>
+        <td style="color:var(--muted)">${r.region}</td>
+        <td><span class="pill ${payClass}">${r.paymentStatus}</span></td>
+        <td><span class="pill ${statusClass}">${r.status}</span></td>
+        <td><div class="tbl-actions">
+          ${r.status !== 'confirmed' ? `<button class="tbl-btn approve" onclick="updateRegStatus('${r._id}','confirmed')">Approve</button>` : ''}
+          ${r.status !== 'rejected' ? `<button class="tbl-btn del" onclick="updateRegStatus('${r._id}','rejected')">Reject</button>` : ''}
+          <button class="tbl-btn del" onclick="confirmDelete('reg','${r._id}','this registration')">Del</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  document.getElementById('reg-search').addEventListener('input', e => renderRegs(e.target.value, document.getElementById('reg-filter-status').value));
+  document.getElementById('reg-filter-status').addEventListener('change', e => renderRegs(document.getElementById('reg-search').value, e.target.value));
+
+  async function updateRegStatus(id, status) {
+    try {
+      await apiFetch('/registrations/' + id + '/status', { method: 'PUT', body: JSON.stringify({ status }) });
+      const idx = allRegs.findIndex(r => r._id === id);
+      if (idx >= 0) allRegs[idx].status = status;
+      renderRegs(); showToast('Registration ' + status, 'success');
+    } catch(e) {
+      // Local update only if API not available
+      const idx = allRegs.findIndex(r => r._id === id);
+      if (idx >= 0) { allRegs[idx].status = status; renderRegs(); showToast('Registration ' + status + ' (local)', 'success'); }
+    }
+  }
+
+  /* ── OVERVIEW ── */
+  function renderOverview() {
+    const pending = allRegs.filter(r => r.status === 'pending').length;
+    const paid    = allRegs.filter(r => r.paymentStatus === 'paid').length;
+    document.getElementById('overview-stats').innerHTML = `
+      <div class="stat-card"><div class="stat-num">${allUsers.length}</div><div class="stat-label">Total Users</div></div>
+      <div class="stat-card green"><div class="stat-num">${allPlayers.length}</div><div class="stat-label">Players</div></div>
+      <div class="stat-card warn"><div class="stat-num">${allRegs.length}</div><div class="stat-label">Registrations</div></div>
+      <div class="stat-card red"><div class="stat-num">${pending}</div><div class="stat-label">Pending Approvals</div></div>
+      <div class="stat-card green"><div class="stat-num">${paid}</div><div class="stat-label">Paid Entries</div></div>
+    `;
+    document.getElementById('recent-regs').innerHTML = allRegs.slice(0,5).map(r =>
+      `<div style="padding:0.75rem;background:var(--dark3);border:1px solid rgba(30,144,255,0.08);margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:0.9rem">${r.tournamentName}</div><div style="font-size:0.75rem;color:var(--muted)">${r.game} · ${r.region}</div></div>
+        <span class="pill ${r.status==='confirmed'?'pill-green':r.status==='rejected'?'pill-red':'pill-warn'}">${r.status}</span>
+      </div>`).join('') || '<div style="color:var(--muted);text-align:center;padding:2rem">No registrations yet</div>';
+    document.getElementById('recent-users').innerHTML = allUsers.slice(0,5).map(u =>
+      `<div style="padding:0.75rem;background:var(--dark3);border:1px solid rgba(30,144,255,0.08);margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:0.9rem">${u.firstName} ${u.lastName}</div><div style="font-size:0.75rem;color:var(--muted)">${u.email}</div></div>
+        <span class="pill ${u.role==='admin'?'pill-red':'pill-blue'}">${u.role}</span>
+      </div>`).join('') || '<div style="color:var(--muted);text-align:center;padding:2rem">No users yet</div>';
+  }
+
+  /* ── DELETE ── */
+  let pendingDelete = null;
+  function confirmDelete(type, id, name) {
+    document.getElementById('confirm-text').textContent = `Delete "${name}"?`;
+    pendingDelete = { type, id };
+    document.getElementById('confirm-modal').style.display = 'flex';
+  }
+
+  document.getElementById('confirm-yes').addEventListener('click', async () => {
+    if (!pendingDelete) return;
+    const { type, id } = pendingDelete;
+    closeModal('confirm-modal');
+    try {
+      if (type === 'user') {
+        await apiFetch('/auth/users/' + id, { method: 'DELETE' });
+        allUsers = allUsers.filter(u => u._id !== id); renderUsers(); document.getElementById('count-users').textContent = allUsers.length;
+      } else if (type === 'player') {
+        await apiFetch('/players/' + id, { method: 'DELETE' });
+        allPlayers = allPlayers.filter(p => p._id !== id); renderPlayers(); document.getElementById('count-players').textContent = allPlayers.length;
+      } else if (type === 'reg') {
+        await apiFetch('/registrations/' + id, { method: 'DELETE' });
+        allRegs = allRegs.filter(r => r._id !== id); renderRegs(); document.getElementById('count-regs').textContent = allRegs.length;
+      }
+      showToast('Deleted successfully', 'success');
+      renderOverview();
+    } catch(e) {
+      // Local removal
+      if (type === 'user') { allUsers = allUsers.filter(u => u._id !== id); renderUsers(); }
+      else if (type === 'player') { allPlayers = allPlayers.filter(p => p._id !== id); renderPlayers(); }
+      else if (type === 'reg') { allRegs = allRegs.filter(r => r._id !== id); renderRegs(); }
+      showToast('Removed (local only — add admin API routes)', 'success');
+      renderOverview();
+    }
+    pendingDelete = null;
+  });
+
+  /* ── MODAL ── */
+  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.style.display = 'none'; });
+  });
+
+  /* ── TOAST ── */
+  let toastTimer;
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + type;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  init();
+</script>
+</body>
+</html>

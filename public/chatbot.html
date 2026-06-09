@@ -653,7 +653,7 @@ app.listen(3000);</div>
 </div>
 
 <script>
-const GROQ_URL    = 'https://apex-arena-xbwd.onrender.com/chat/groq';
+const GROQ_URL    = '/chat/groq';
 const GROQ_MODEL  = 'llama-3.1-8b-instant';
 const STORAGE_KEY = 'apexArena_chatHistory'; // key used to persist chat in localStorage
 
@@ -674,7 +674,7 @@ let messages    = [];
 let isStreaming  = false;
 
 // ── PERSISTENCE ──────────────────────────────────────────────────────────────
-const API_BASE = 'https://apex-arena-xbwd.onrender.com';
+const API_BASE = '';  // relative — works on any host
 const CHAT_SESSION = localStorage.getItem('apexChatSession') || ('session_' + Date.now());
 localStorage.setItem('apexChatSession', CHAT_SESSION);
 

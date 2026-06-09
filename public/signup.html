@@ -737,7 +737,7 @@
     btn.disabled = true;
 
     try {
-      const res = await fetch('https://apex-arena-xbwd.onrender.com/auth/signup', {
+      const res = await fetch('/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

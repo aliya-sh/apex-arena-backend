@@ -80,6 +80,41 @@
   .btn-register:hover { background: var(--gold-light); transform: translateY(-2px); }
   .btn-register:active { transform: translateY(0); }
   .btn-register:disabled { background: rgba(30,144,255,0.3); color: rgba(10,10,10,0.5); cursor: not-allowed; transform: none; }
+  /* ── PAYMENT MODAL ── */
+  .pay-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 500; display: none; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(6px); }
+  .pay-overlay.open { display: flex; }
+  .pay-modal { background: #080D1A; border: 1px solid rgba(30,144,255,0.3); width: 100%; max-width: 440px; position: relative; overflow: hidden; }
+  .pay-modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #1E90FF, #0055CC); }
+  .pay-header { padding: 2rem 2rem 0; }
+  .pay-title { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: #1E90FF; letter-spacing: 0.04em; }
+  .pay-subtitle { font-size: 0.85rem; color: #888; margin-top: 0.3rem; font-family: 'Barlow', sans-serif; }
+  .pay-body { padding: 1.5rem 2rem; }
+  .pay-amount-box { background: rgba(30,144,255,0.07); border: 1px solid rgba(30,144,255,0.2); padding: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+  .pay-amount-left .pay-amount-label { font-family: 'Barlow Condensed', sans-serif; font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: #888; }
+  .pay-amount-left .pay-amount-usd { font-size: 0.78rem; color: #888; font-family: 'Barlow', sans-serif; margin-top: 0.2rem; }
+  .pay-amount-value { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; color: #F0EDE8; line-height: 1; }
+  .pay-methods { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
+  .pay-method { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 1.25rem; border: 1px solid rgba(30,144,255,0.18); cursor: pointer; transition: all 0.2s; background: transparent; width: 100%; text-align: left; color: #F0EDE8; }
+  .pay-method:hover, .pay-method.selected { border-color: #1E90FF; background: rgba(30,144,255,0.08); }
+  .pay-method-icon { font-size: 1.5rem; width: 34px; text-align: center; flex-shrink: 0; }
+  .pay-method-name { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.03em; display: block; }
+  .pay-method-desc { font-size: 0.75rem; color: #888; display: block; }
+  .pay-method-badge { margin-left: auto; font-family: 'Barlow Condensed', sans-serif; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.18rem 0.55rem; border: 1px solid rgba(30,144,255,0.3); color: #1E90FF; white-space: nowrap; }
+  .pay-footer { padding: 0 2rem 2rem; display: flex; gap: 1rem; }
+  .pay-btn-confirm { flex: 1; padding: 0.9rem; background: #1E90FF; color: #050810; font-family: 'Barlow Condensed', sans-serif; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; border: none; cursor: pointer; transition: opacity 0.2s; }
+  .pay-btn-confirm:hover { opacity: 0.88; }
+  .pay-btn-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
+  .pay-btn-cancel { padding: 0.9rem 1.4rem; background: transparent; border: 1px solid rgba(30,144,255,0.25); color: #888; font-family: 'Barlow Condensed', sans-serif; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .pay-btn-cancel:hover { border-color: #E53935; color: #E53935; }
+  .pay-processing { text-align: center; padding: 2.5rem 2rem; display: none; }
+  @keyframes pspin { to { transform: rotate(360deg); } }
+  .pay-spinner { width: 44px; height: 44px; border: 2px solid rgba(30,144,255,0.2); border-top-color: #1E90FF; border-radius: 50%; animation: pspin 0.8s linear infinite; margin: 0 auto 1rem; }
+  .pay-spinner-label { font-family: 'Barlow Condensed', sans-serif; font-size: 0.85rem; color: #888; letter-spacing: 0.1em; }
+  .pay-success-box { text-align: center; padding: 1.5rem 2rem 2rem; display: none; }
+  .pay-success-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+  .pay-success-title { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: #4CAF50; margin-bottom: 0.5rem; }
+  .pay-success-hash { font-size: 0.72rem; color: #888; word-break: break-all; font-family: 'Barlow Condensed', sans-serif; margin-top: 0.5rem; }
+
  
   /* ── PARTICIPANTS PANEL ── */
   .participants-panel { animation: fadeUp 0.8s 0.5s ease both; }
@@ -410,8 +445,12 @@
   renderList();
   updateSlots();
 
-  // ── FORM SUBMIT ──
-  document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+  // ── PENDING REGISTRATION STATE ──
+  let pendingReg = {};
+  let selectedPayMethod = 'metamask';
+
+  // ── FORM SUBMIT — validates then opens payment modal ──
+  document.getElementById('registrationForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
     const nameInput   = document.getElementById('playerName');
@@ -435,16 +474,75 @@
       return;
     }
 
+    // Store for after payment
+    pendingReg = { playerName, gameId, teamName };
+
+    // Open payment modal
+    document.getElementById('payStep1').style.display = 'block';
+    document.getElementById('payStep2').style.display = 'none';
+    document.getElementById('payStep3').style.display = 'none';
+    document.getElementById('payOverlay').classList.add('open');
+  });
+
+  // ── PAYMENT METHOD SELECTION ──
+  function selectMethod(btn) {
+    document.querySelectorAll('.pay-method').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedPayMethod = btn.dataset.method;
+    const labels = { metamask: 'Pay 0.05 ETH', stripe: 'Pay $12.50 USD', paypal: 'Pay via PayPal' };
+    document.getElementById('payConfirmBtn').textContent = labels[selectedPayMethod] || 'Pay Now';
+  }
+
+  function closePayModal() {
+    document.getElementById('payOverlay').classList.remove('open');
+  }
+
+  // ── PROCESS PAYMENT ──
+  function processPayment() {
+    const step1 = document.getElementById('payStep1');
+    const step2 = document.getElementById('payStep2');
+    const step3 = document.getElementById('payStep3');
+
+    const processingLabels = {
+      metamask: 'Connecting to MetaMask…',
+      stripe:   'Contacting Stripe…',
+      paypal:   'Connecting to PayPal…'
+    };
+
+    step1.style.display = 'none';
+    step2.style.display = 'block';
+    document.getElementById('payProcessingLabel').textContent = processingLabels[selectedPayMethod];
+
+    // Simulate payment processing (1.5s) then show success
+    setTimeout(() => {
+      step2.style.display = 'none';
+      step3.style.display = 'block';
+
+      // Generate a fake tx hash
+      const txHash = '0x' + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join('');
+      document.getElementById('payTxHash').textContent = 'TX: ' + txHash;
+
+      // After showing success, complete registration (0.8s)
+      setTimeout(() => {
+        completeRegistration(txHash);
+      }, 800);
+    }, 1800);
+  }
+
+  // ── COMPLETE REGISTRATION AFTER PAYMENT ──
+  async function completeRegistration(txHash) {
+    closePayModal();
+
+    const { playerName, gameId, teamName } = pendingReg;
     const btn = document.getElementById('registerBtn');
-    btn.textContent = 'Registering...';
+    btn.textContent = 'Saving…';
     btn.disabled = true;
 
     const token = localStorage.getItem('apexToken');
 
-    // Try saving to database if logged in
     if (token) {
       try {
-        const res = await fetch('https://apex-arena-xbwd.onrender.com/registrations', {
+        const res = await fetch('/registrations', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
           body: JSON.stringify({
@@ -453,7 +551,10 @@
             game:           'Valorant',
             inGameName:     gameId,
             teamName:       teamName,
-            region:         'Global'
+            region:         'Global',
+            entryFee:       '0.05 ETH',
+            paymentStatus:  'paid',
+            txHash:         txHash
           })
         });
         const data = await res.json();
@@ -464,22 +565,23 @@
           return;
         }
       } catch(err) {
-        // Server unreachable — fall back to local only
+        // Server unreachable — continue with local save
       }
     }
 
-    // Also keep local list for display
     const player = { name: playerName, gameId: gameId, team: teamName };
     participants.push(player);
     localStorage.setItem('apexParticipants', JSON.stringify(participants));
 
-    this.reset();
+    document.getElementById('registrationForm').reset();
     btn.textContent = '⚔ Register for Tournament';
     btn.disabled = false;
-    showAlert('success', '✓ ' + playerName + ' registered successfully!' + (token ? ' Saved to database!' : ' (Log in to save permanently)'));
+
+    showAlert('success', '✓ Payment confirmed! ' + playerName + ' registered successfully.' + (token ? ' Saved to database.' : ' (Log in to save permanently)'));
     renderList();
     updateSlots();
-  });
+    pendingReg = {};
+  }
 
   // ── RENDER LIST ──
   function renderList() {
@@ -636,6 +738,65 @@
     <div class="modal-actions">
       <button class="btn-modal-confirm" onclick="confirmClearAll()">✕ Yes, Clear All</button>
       <button class="btn-modal-cancel" onclick="closeClearModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- PAYMENT GATEWAY MODAL -->
+<div class="pay-overlay" id="payOverlay">
+  <div class="pay-modal" id="payModal">
+    <div class="pay-header">
+      <div class="pay-title">ENTRY FEE PAYMENT</div>
+      <div class="pay-subtitle">Select a payment method to complete registration</div>
+    </div>
+
+    <!-- Step 1: Choose method -->
+    <div id="payStep1">
+      <div class="pay-body">
+        <div class="pay-amount-box">
+          <div class="pay-amount-left">
+            <div class="pay-amount-label">Tournament Entry Fee</div>
+            <div class="pay-amount-usd">≈ $12.50 USD</div>
+          </div>
+          <div class="pay-amount-value">0.05 ETH</div>
+        </div>
+        <div class="pay-methods">
+          <button class="pay-method selected" data-method="metamask" onclick="selectMethod(this)">
+            <span class="pay-method-icon">🦊</span>
+            <span><span class="pay-method-name">MetaMask</span><span class="pay-method-desc">Pay with your Ethereum wallet</span></span>
+            <span class="pay-method-badge">Web3</span>
+          </button>
+          <button class="pay-method" data-method="stripe" onclick="selectMethod(this)">
+            <span class="pay-method-icon">💳</span>
+            <span><span class="pay-method-name">Credit / Debit Card</span><span class="pay-method-desc">Visa, Mastercard, AMEX via Stripe</span></span>
+            <span class="pay-method-badge">Stripe</span>
+          </button>
+          <button class="pay-method" data-method="paypal" onclick="selectMethod(this)">
+            <span class="pay-method-icon">🅿️</span>
+            <span><span class="pay-method-name">PayPal</span><span class="pay-method-desc">Pay via your PayPal balance</span></span>
+            <span class="pay-method-badge">PayPal</span>
+          </button>
+        </div>
+      </div>
+      <div class="pay-footer">
+        <button class="pay-btn-cancel" onclick="closePayModal()">Cancel</button>
+        <button class="pay-btn-confirm" id="payConfirmBtn" onclick="processPayment()">Pay 0.05 ETH</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Processing -->
+    <div class="pay-processing" id="payStep2">
+      <div class="pay-spinner"></div>
+      <div class="pay-spinner-label" id="payProcessingLabel">Connecting to MetaMask…</div>
+    </div>
+
+    <!-- Step 3: Success -->
+    <div class="pay-success-box" id="payStep3">
+      <div class="pay-success-icon">✅</div>
+      <div class="pay-success-title">Payment Confirmed!</div>
+      <div style="font-family:'Barlow',sans-serif;font-size:0.88rem;color:#F0EDE8;margin-top:0.5rem">Entry fee received. Completing registration…</div>
+      <div class="pay-success-hash" id="payTxHash"></div>
     </div>
   </div>
 </div>

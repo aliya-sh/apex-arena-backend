@@ -587,13 +587,75 @@
   }
 
   /* ── FORM SUBMIT ── */
-  document.getElementById('loginForm').addEventListener('submit', (e) => {
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const v1 = validateEmail();
     const v2 = validatePassword();
+    if (!v1 || !v2) return;
 
-    if (v1 && v2) {
+    const submitBtn = document.querySelector('.btn-submit');
+    const errorBanner = document.getElementById('loginError');
+    submitBtn.textContent = 'Authenticating…';
+    submitBtn.disabled = true;
+    if (errorBanner) errorBanner.style.display = 'none';
+
+    try {
+      const res = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: emailEl.value.trim(),
+          password: passwordEl.value
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Show error message
+        let banner = document.getElementById('loginError');
+        if (!banner) {
+          banner = document.createElement('div');
+          banner.id = 'loginError';
+          banner.style.cssText = 'background:rgba(229,57,53,0.12);border:1px solid rgba(229,57,53,0.4);color:#ff6f6b;padding:0.75rem 1rem;margin-bottom:1rem;font-family:"Barlow Condensed",sans-serif;font-size:0.9rem;letter-spacing:0.04em;';
+          document.getElementById('loginForm').prepend(banner);
+        }
+        banner.textContent = '✕ ' + (data.error || 'Invalid email or password');
+        banner.style.display = 'block';
+        submitBtn.textContent = 'Login to Arena';
+        submitBtn.disabled = false;
+        return;
+      }
+
+      // ── SUCCESS: store token + user, redirect ──
+      localStorage.setItem('apexToken', data.token);
+      localStorage.setItem('apexUser', JSON.stringify(data.user));
+
+      // Show success overlay then redirect
       document.getElementById('successOverlay').classList.add('show');
+      document.getElementById('successName').textContent = data.user.firstName || 'Champion';
+
+      // Redirect after 1.8s — admins go to admin panel
+      setTimeout(() => {
+        if (data.user.role === 'admin') {
+          location.href = 'admin.html';
+        } else {
+          location.href = 'profile.html';
+        }
+      }, 1800);
+
+    } catch (err) {
+      let banner = document.getElementById('loginError');
+      if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'loginError';
+        banner.style.cssText = 'background:rgba(229,57,53,0.12);border:1px solid rgba(229,57,53,0.4);color:#ff6f6b;padding:0.75rem 1rem;margin-bottom:1rem;font-family:"Barlow Condensed",sans-serif;font-size:0.9rem;';
+        document.getElementById('loginForm').prepend(banner);
+      }
+      banner.textContent = '✕ Server error — please try again.';
+      banner.style.display = 'block';
+      submitBtn.textContent = 'Login to Arena';
+      submitBtn.disabled = false;
     }
   });
 </script>
@@ -601,8 +663,8 @@
 <div class="success-overlay" id="successOverlay">
   <div class="success-icon">⚡</div>
   <div class="success-title">Access Granted!</div>
-  <div class="success-sub">Welcome back to APEX ARENA.</div>
-  <a href="index.html" class="btn-go">Go to Dashboard</a>
+  <div class="success-sub">Welcome back, <span id="successName">Champion</span>.</div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;color:#888;margin-top:0.5rem">Redirecting to your profile…</div>
 </div>
 
 </body>

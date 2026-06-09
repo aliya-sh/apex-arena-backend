@@ -8,7 +8,6 @@ router.post('/', auth, async (req, res) => {
   try {
     const { tournamentName, tournamentId, game, teamName, inGameName, region, entryFee, txHash } = req.body;
 
-    // Check duplicate
     const exists = await Registration.findOne({ user: req.userId, tournamentId });
     if (exists) return res.status(409).json({ error: 'Already registered for this tournament' });
 
@@ -37,7 +36,41 @@ router.get('/mine', auth, async (req, res) => {
   }
 });
 
-// ── GET /registrations/:tournamentId  — all registrants for a tournament (admin)
+// ── GET /registrations/all  (admin — all registrations) — MUST be before /:tournamentId
+router.get('/all', auth, async (req, res) => {
+  try {
+    const regs = await Registration.find()
+      .populate('user', 'firstName lastName email')
+      .sort({ createdAt: -1 });
+    res.json(regs);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── PUT /registrations/:id/status  (admin — approve/reject)
+router.put('/:id/status', auth, async (req, res) => {
+  try {
+    const { status } = req.body;
+    const reg = await Registration.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    if (!reg) return res.status(404).json({ error: 'Not found' });
+    res.json(reg);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// ── DELETE /registrations/:id  (admin)
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    await Registration.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /registrations/:tournamentId  — all registrants for a tournament
 router.get('/:tournamentId', auth, async (req, res) => {
   try {
     const regs = await Registration
