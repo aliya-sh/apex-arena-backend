@@ -707,23 +707,26 @@
   }
 
   // ── LOGIN STATUS BANNER ──
-  (function showLoginStatus() {
+  window.addEventListener('DOMContentLoaded', function() {
     const banner = document.getElementById('login-status-banner');
     if (!banner) return;
     const token = localStorage.getItem('apexToken');
-    const user  = JSON.parse(localStorage.getItem('apexUser') || 'null');
+    let user = null;
+    try { user = JSON.parse(localStorage.getItem('apexUser')); } catch(e) {}
     if (token && user) {
-      banner.style.borderColor = 'rgba(76,175,80,0.4)';
-      banner.style.background  = 'rgba(76,175,80,0.08)';
+      banner.style.display     = 'flex';
+      banner.style.borderColor = 'rgba(76,175,80,0.5)';
+      banner.style.background  = 'rgba(76,175,80,0.1)';
       banner.style.color       = '#4CAF50';
-      banner.innerHTML = '✓ Logged in as <strong style="margin-left:0.3rem">' + user.firstName + ' ' + user.lastName + '</strong> — registration will save to database';
+      banner.innerHTML = '✅ Logged in as <strong style="margin-left:0.3rem;color:#fff">' + user.firstName + ' ' + user.lastName + '</strong>&nbsp;— registration will save to database';
     } else {
-      banner.style.borderColor = 'rgba(255,179,0,0.4)';
-      banner.style.background  = 'rgba(255,179,0,0.06)';
+      banner.style.display     = 'flex';
+      banner.style.borderColor = 'rgba(255,179,0,0.5)';
+      banner.style.background  = 'rgba(255,179,0,0.08)';
       banner.style.color       = '#FFB300';
-      banner.innerHTML = '⚠ Not logged in — <a href="login.html" style="color:#1E90FF;text-decoration:underline">Login first</a> to save registration to database';
+      banner.innerHTML = '⚠️ You are not logged in — <a href="login.html" style="color:#1E90FF;font-weight:700;text-decoration:underline;margin-left:0.3rem">Click here to Login</a> before registering';
     }
-  })();
+  });
 
   // ── RENDER LIST ──
   function renderList() {
