@@ -274,483 +274,59 @@
     <!-- DB SCHEMA -->
     <div class="section-panel" id="tab-schema">
       <div class="content-header">
-        <div><div class="content-title">DATABASE SCHEMA</div><div class="content-sub">Relational structure — MongoDB Atlas / Mongoose</div></div>
+        <div><div class="content-title">DATABASE SCHEMA</div><div class="content-sub">Relational structure — MongoDB Atlas / Mongoose &nbsp;|&nbsp; Total Collections: <strong style="color:var(--gold)">5</strong></div></div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem">
-        <!-- USERS TABLE -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.5rem">
+
+        <!-- USERS -->
         <div class="stat-card" style="padding:1.5rem">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem">📋 users</div>
-          <table style="width:100%;font-size:0.8rem;border-collapse:collapse">
-            <tr style="border-bottom:1px solid rgba(30,144,255,0.15)"><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">FIELD</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">TYPE</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">NOTES</th></tr>
-            ${[['_id','ObjectId','PK, auto'],['firstName','String','required'],['lastName','String','required'],['email','String','unique, required'],['password','String','bcrypt hashed'],['role','Enum','player|admin'],['avatar','String','URL'],['createdAt','Date','auto']].map(r=>`<tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.4rem 0.5rem;color:var(--gold);font-family:'Barlow Condensed',sans-serif">${r[0]}</td><td style="padding:0.4rem 0.5rem;color:var(--off-white)">${r[1]}</td><td style="padding:0.4rem 0.5rem;color:var(--muted);font-size:0.75rem">${r[2]}</td></tr>`).join('')}
-          </table>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem">📋 <span>users</span></div>
+          <table style="width:100%;font-size:0.82rem;border-collapse:collapse"><tr style="border-bottom:1px solid rgba(30,144,255,0.15)"><th style="text-align:left;padding:0.5rem 0.75rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.12em;font-size:0.65rem;background:rgba(30,144,255,0.05)">FIELD</th><th style="text-align:left;padding:0.5rem 0.75rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.12em;font-size:0.65rem;background:rgba(30,144,255,0.05)">TYPE</th><th style="text-align:left;padding:0.5rem 0.75rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.12em;font-size:0.65rem;background:rgba(30,144,255,0.05)">NOTES</th></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">_id</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">ObjectId</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Primary Key, auto-generated</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">firstName</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Required</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">lastName</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Required</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">email</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Unique, required</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">password</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">bcrypt hashed (12 rounds)</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">role</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Enum</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">player | admin</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">avatar</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Profile image URL</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">createdAt</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Date</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Auto timestamp</td></tr></table>
         </div>
-        <!-- PLAYERS TABLE -->
+
+        <!-- PLAYERS -->
         <div class="stat-card" style="padding:1.5rem">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem">🎮 players</div>
-          <table style="width:100%;font-size:0.8rem;border-collapse:collapse">
-            <tr style="border-bottom:1px solid rgba(30,144,255,0.15)"><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">FIELD</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">TYPE</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">NOTES</th></tr>
-            ${[['_id','ObjectId','PK, auto'],['name','String','required'],['country','String','flag + name'],['rank','Number','1-indexed'],['wins','Number','total wins'],['losses','Number','total losses'],['game','String','Valorant etc.'],['photo','String','image URL'],['user','Ref→users','nullable FK']].map(r=>`<tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.4rem 0.5rem;color:var(--gold);font-family:'Barlow Condensed',sans-serif">${r[0]}</td><td style="padding:0.4rem 0.5rem;color:var(--off-white)">${r[1]}</td><td style="padding:0.4rem 0.5rem;color:var(--muted);font-size:0.75rem">${r[2]}</td></tr>`).join('')}
-          </table>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem">🎮 <span>players</span></div>
+          <table style="width:100%;font-size:0.82rem;border-collapse:collapse"><tr style="border-bottom:1px solid rgba(30,144,255,0.15)"><th style="text-align:left;padding:0.5rem 0.75rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.12em;font-size:0.65rem;background:rgba(30,144,255,0.05)">FIELD</th><th style="text-align:left;padding:0.5rem 0.75rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.12em;font-size:0.65rem;background:rgba(30,144,255,0.05)">TYPE</th><th style="text-align:left;padding:0.5rem 0.75rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.12em;font-size:0.65rem;background:rgba(30,144,255,0.05)">NOTES</th></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">_id</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">ObjectId</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Primary Key, auto-generated</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">name</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Required</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">country</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Flag emoji + country name</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">rank</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Number</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">1-indexed ranking</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">wins</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Number</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Total wins</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">losses</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Number</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Total losses</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">game</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Valorant, CS2, LoL, Apex</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">photo</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Image URL</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">user</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Ref → users</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Optional FK to user account</td></tr></table>
         </div>
-        <!-- REGISTRATIONS TABLE -->
+
+        <!-- REGISTRATIONS -->
         <div class="stat-card" style="padding:1.5rem">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem">📝 registrations</div>
-          <table style="width:100%;font-size:0.8rem;border-collapse:collapse">
-            <tr style="border-bottom:1px solid rgba(30,144,255,0.15)"><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">FIELD</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">TYPE</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">NOTES</th></tr>
-            ${[['_id','ObjectId','PK'],['user','Ref→users','FK required'],['tournamentName','String','required'],['tournamentId','String','required'],['game','String','required'],['teamName','String','optional'],['inGameName','String','required'],['region','String','required'],['entryFee','String','e.g. 0.05 ETH'],['paymentStatus','Enum','pending|paid|refunded'],['txHash','String','ETH tx hash'],['status','Enum','pending|confirmed|rejected'],['createdAt','Date','auto']].map(r=>`<tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.4rem 0.5rem;color:var(--gold);font-family:'Barlow Condensed',sans-serif">${r[0]}</td><td style="padding:0.4rem 0.5rem;color:var(--off-white)">${r[1]}</td><td style="padding:0.4rem 0.5rem;color:var(--muted);font-size:0.75rem">${r[2]}</td></tr>`).join('')}
-          </table>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem">📝 <span>registrations</span></div>
+          <table style="width:100%;font-size:0.82rem;border-collapse:collapse"><tr style="border-bottom:1px solid rgba(30,144,255,0.15)"><th style="text-align:left;padding:0.5rem 0.75rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.12em;font-size:0.65rem;background:rgba(30,144,255,0.05)">FIELD</th><th style="text-align:left;padding:0.5rem 0.75rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.12em;font-size:0.65rem;background:rgba(30,144,255,0.05)">TYPE</th><th style="text-align:left;padding:0.5rem 0.75rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.12em;font-size:0.65rem;background:rgba(30,144,255,0.05)">NOTES</th></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">_id</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">ObjectId</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Primary Key</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">user</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Ref → users</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Foreign Key (required)</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">tournamentName</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Required</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">tournamentId</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Required</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">game</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Required</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">teamName</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Optional</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">inGameName</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Required (IGN)</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">region</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Required</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">entryFee</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">e.g. 0.05 ETH</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">paymentStatus</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Enum</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">pending | paid | refunded</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">txHash</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Blockchain transaction hash</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">status</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Enum</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">pending | confirmed | rejected</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">createdAt</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Date</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Auto timestamp</td></tr></table>
         </div>
-        <!-- TRANSACTIONS TABLE -->
+
+        <!-- TRANSACTIONS -->
         <div class="stat-card" style="padding:1.5rem">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem">💳 transactions</div>
-          <table style="width:100%;font-size:0.8rem;border-collapse:collapse">
-            <tr style="border-bottom:1px solid rgba(30,144,255,0.15)"><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">FIELD</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">TYPE</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">NOTES</th></tr>
-            ${[['_id','ObjectId','PK'],['user','Ref→users','FK'],['type','Enum','deposit|withdrawal|payment'],['amount','Number','value'],['currency','String','ETH/USDT/USD'],['txHash','String','chain tx hash'],['status','Enum','pending|confirmed|failed'],['createdAt','Date','auto']].map(r=>`<tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.4rem 0.5rem;color:var(--gold);font-family:'Barlow Condensed',sans-serif">${r[0]}</td><td style="padding:0.4rem 0.5rem;color:var(--off-white)">${r[1]}</td><td style="padding:0.4rem 0.5rem;color:var(--muted);font-size:0.75rem">${r[2]}</td></tr>`).join('')}
-          </table>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem">💳 <span>transactions</span></div>
+          <table style="width:100%;font-size:0.82rem;border-collapse:collapse"><tr style="border-bottom:1px solid rgba(30,144,255,0.15)"><th style="text-align:left;padding:0.5rem 0.75rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.12em;font-size:0.65rem;background:rgba(30,144,255,0.05)">FIELD</th><th style="text-align:left;padding:0.5rem 0.75rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.12em;font-size:0.65rem;background:rgba(30,144,255,0.05)">TYPE</th><th style="text-align:left;padding:0.5rem 0.75rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.12em;font-size:0.65rem;background:rgba(30,144,255,0.05)">NOTES</th></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">_id</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">ObjectId</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Primary Key</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">user</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Ref → users</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Foreign Key</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">type</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Enum</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">deposit | withdrawal | payment</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">amount</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Number</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Transaction value</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">currency</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">ETH / USDT / USD</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">txHash</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Blockchain tx hash</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">status</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Enum</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">pending | confirmed | failed</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">createdAt</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Date</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Auto timestamp</td></tr></table>
         </div>
-        <!-- CHATMESSAGES TABLE -->
+
+        <!-- CHATMESSAGES -->
         <div class="stat-card" style="padding:1.5rem">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem">💬 chatmessages</div>
-          <table style="width:100%;font-size:0.8rem;border-collapse:collapse">
-            <tr style="border-bottom:1px solid rgba(30,144,255,0.15)"><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">FIELD</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">TYPE</th><th style="text-align:left;padding:0.4rem 0.5rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.65rem">NOTES</th></tr>
-            ${[['_id','ObjectId','PK'],['user','Ref→users','nullable FK'],['role','Enum','user|assistant'],['content','String','message text'],['createdAt','Date','auto']].map(r=>`<tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.4rem 0.5rem;color:var(--gold);font-family:'Barlow Condensed',sans-serif">${r[0]}</td><td style="padding:0.4rem 0.5rem;color:var(--off-white)">${r[1]}</td><td style="padding:0.4rem 0.5rem;color:var(--muted);font-size:0.75rem">${r[2]}</td></tr>`).join('')}
-          </table>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem">💬 <span>chatmessages</span></div>
+          <table style="width:100%;font-size:0.82rem;border-collapse:collapse"><tr style="border-bottom:1px solid rgba(30,144,255,0.15)"><th style="text-align:left;padding:0.5rem 0.75rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.12em;font-size:0.65rem;background:rgba(30,144,255,0.05)">FIELD</th><th style="text-align:left;padding:0.5rem 0.75rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.12em;font-size:0.65rem;background:rgba(30,144,255,0.05)">TYPE</th><th style="text-align:left;padding:0.5rem 0.75rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.12em;font-size:0.65rem;background:rgba(30,144,255,0.05)">NOTES</th></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">_id</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">ObjectId</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Primary Key</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">user</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Ref → users</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Nullable FK</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">role</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Enum</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">user | assistant</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">content</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Message text</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">sessionId</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">String</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Groups messages by session</td></tr><tr style="border-bottom:1px solid rgba(30,144,255,0.05)"><td style="padding:0.45rem 0.75rem;color:#1E90FF;font-family:'Barlow Condensed',sans-serif;font-weight:600">createdAt</td><td style="padding:0.45rem 0.75rem;color:var(--off-white)">Date</td><td style="padding:0.45rem 0.75rem;color:var(--muted);font-size:0.78rem">Auto timestamp</td></tr></table>
         </div>
+
         <!-- SUMMARY -->
-        <div class="stat-card" style="padding:1.5rem;border-color:rgba(30,144,255,0.2)">
+        <div class="stat-card" style="padding:1.5rem;border-color:rgba(30,144,255,0.25)">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1rem">📌 Summary</div>
-          <div style="font-size:0.85rem;color:var(--off-white);line-height:1.8">
-            <div>Total tables: <strong style="color:var(--gold)">5</strong></div>
-            <div style="margin-top:0.5rem;color:var(--muted);font-size:0.8rem">users, players, registrations, transactions, chatmessages</div>
-            <div style="margin-top:1rem">CRUD Operations:</div>
-            <div style="color:var(--muted);font-size:0.8rem;line-height:2">
-              ✅ <strong style="color:var(--green)">Create</strong> — POST /auth/signup, /players, /registrations<br>
-              ✅ <strong style="color:var(--gold)">Read</strong> — GET /players, /registrations, /auth/me<br>
-              ✅ <strong style="color:var(--warn)">Update</strong> — PUT /players/:id, /registrations/:id/status<br>
-              ✅ <strong style="color:var(--red)">Delete</strong> — DELETE /players/:id, /registrations/:id
+          <div style="font-size:0.85rem;color:var(--off-white);line-height:1.9">
+            <div>Total collections: <strong style="color:var(--gold)">5</strong></div>
+            <div style="color:var(--muted);font-size:0.8rem;margin-bottom:1rem">users &nbsp;·&nbsp; players &nbsp;·&nbsp; registrations &nbsp;·&nbsp; transactions &nbsp;·&nbsp; chatmessages</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;font-size:0.7rem;color:var(--muted);margin-bottom:0.5rem">CRUD OPERATIONS</div>
+            <div style="display:flex;flex-direction:column;gap:0.4rem;font-size:0.82rem">
+              <div><span style="color:var(--green);font-weight:700">CREATE</span> &nbsp;POST /auth/signup &nbsp;·&nbsp; POST /players &nbsp;·&nbsp; POST /registrations &nbsp;·&nbsp; POST /auth/contact</div>
+              <div><span style="color:#1E90FF;font-weight:700">READ &nbsp;&nbsp;&nbsp;</span> GET /players &nbsp;·&nbsp; GET /auth/me &nbsp;·&nbsp; GET /registrations/all &nbsp;·&nbsp; GET /auth/users</div>
+              <div><span style="color:var(--warn);font-weight:700">UPDATE</span> PUT /players/:id &nbsp;·&nbsp; PUT /auth/users/:id &nbsp;·&nbsp; PUT /registrations/:id/status</div>
+              <div><span style="color:var(--red);font-weight:700">DELETE</span> DELETE /players/:id &nbsp;·&nbsp; DELETE /auth/users/:id &nbsp;·&nbsp; DELETE /registrations/:id</div>
             </div>
           </div>
         </div>
+
       </div>
     </div>
 
   </main>
 </div>
 </div>
-
-<!-- MODAL: Edit/Add User -->
-<div class="modal-overlay" id="user-modal" style="display:none">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('user-modal')">✕</button>
-    <div class="modal-title" id="user-modal-title">Edit User</div>
-    <input type="hidden" id="user-modal-id">
-    <div class="modal-field"><label>First Name</label><input type="text" id="um-first"></div>
-    <div class="modal-field"><label>Last Name</label><input type="text" id="um-last"></div>
-    <div class="modal-field"><label>Email</label><input type="email" id="um-email"></div>
-    <div class="modal-field"><label>Role</label><select id="um-role"><option value="player">Player</option><option value="admin">Admin</option></select></div>
-    <div class="modal-footer">
-      <button class="action-btn btn-red" onclick="closeModal('user-modal')">Cancel</button>
-      <button class="action-btn btn-green" id="user-modal-save">Save Changes</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: Edit/Add Player -->
-<div class="modal-overlay" id="player-modal" style="display:none">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('player-modal')">✕</button>
-    <div class="modal-title" id="player-modal-title">Add Player</div>
-    <input type="hidden" id="pm-id">
-    <div class="modal-field"><label>Name</label><input type="text" id="pm-name"></div>
-    <div class="modal-field"><label>Country (emoji + name)</label><input type="text" id="pm-country" placeholder="🇵🇰 Pakistan"></div>
-    <div class="modal-field" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-      <div><label>Rank</label><input type="number" id="pm-rank" min="1"></div>
-      <div><label>Game</label><select id="pm-game"><option>Valorant</option><option>CS2</option><option>League of Legends</option><option>Apex Legends</option></select></div>
-    </div>
-    <div class="modal-field" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-      <div><label>Wins</label><input type="number" id="pm-wins" min="0"></div>
-      <div><label>Losses</label><input type="number" id="pm-losses" min="0"></div>
-    </div>
-    <div class="modal-field"><label>Photo URL</label><input type="text" id="pm-photo" placeholder="https://…"></div>
-    <div class="modal-footer">
-      <button class="action-btn btn-red" onclick="closeModal('player-modal')">Cancel</button>
-      <button class="action-btn btn-green" id="player-modal-save">Save Player</button>
-    </div>
-  </div>
-</div>
-
-<!-- CONFIRM DELETE MODAL -->
-<div class="modal-overlay" id="confirm-modal" style="display:none">
-  <div class="modal" style="max-width:380px">
-    <div class="modal-title" style="color:var(--red)">Confirm Delete</div>
-    <p class="confirm-text" id="confirm-text">Are you sure?</p>
-    <p class="confirm-sub">This action cannot be undone.</p>
-    <div class="modal-footer">
-      <button class="action-btn btn-blue" onclick="closeModal('confirm-modal')">Cancel</button>
-      <button class="action-btn btn-red" id="confirm-yes">Delete</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
-<script>
-  const token = localStorage.getItem('apexToken');
-  let userData = null;
-  try { userData = JSON.parse(localStorage.getItem('apexUser')); } catch {}
-
-  /* ── AUTH CHECK ── */
-  async function init() {
-    if (!token) { showGate('Login required'); return; }
-    try {
-      const res = await fetch('/auth/me', { headers: { Authorization: 'Bearer ' + token } });
-      if (!res.ok) throw new Error();
-      const user = await res.json();
-      if (user.role !== 'admin') { showGate('Admin access required. Your account role is: ' + user.role); return; }
-      userData = user;
-      document.getElementById('admin-name').textContent = user.firstName + ' ' + user.lastName;
-      document.getElementById('admin-interface').style.display = 'block';
-      loadAll();
-    } catch {
-      if (userData && userData.role === 'admin') {
-        document.getElementById('admin-interface').style.display = 'block';
-        document.getElementById('admin-name').textContent = userData.firstName + ' ' + userData.lastName;
-        loadAll();
-      } else {
-        showGate('Could not verify admin access. Please log in again.');
-      }
-    }
-  }
-
-  function showGate(msg) {
-    document.getElementById('auth-gate').style.display = 'block';
-    document.querySelector('.gate-text').textContent = msg;
-  }
-
-  document.getElementById('logout-btn').addEventListener('click', () => {
-    localStorage.removeItem('apexToken'); localStorage.removeItem('apexUser');
-    location.href = 'login.html';
-  });
-
-  /* ── TABS ── */
-  document.querySelectorAll('.sidebar-item').forEach(item => {
-    item.addEventListener('click', () => {
-      document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-      document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
-      item.classList.add('active');
-      document.getElementById('tab-' + item.dataset.tab).classList.add('active');
-    });
-  });
-
-  /* ── DATA STORES ── */
-  let allUsers = [], allPlayers = [], allRegs = [];
-
-  async function loadAll() {
-    await Promise.all([loadUsers(), loadPlayers(), loadRegistrations()]);
-    renderOverview();
-  }
-
-  /* ── API HELPERS ── */
-  async function apiFetch(url, opts = {}) {
-    const res = await fetch(url, { ...opts, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token, ...(opts.headers || {}) } });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
-  }
-
-  /* ── USERS ── */
-  async function loadUsers() {
-    try {
-      // GET /auth/users (admin endpoint added in routes)
-      const data = await apiFetch('/auth/users');
-      allUsers = data;
-    } catch {
-      // Fallback: show demo data
-      allUsers = [
-        { _id: 'u1', firstName: 'aliya', lastName: 'shahid', email: 'aliya@email.com', role: 'player', createdAt: new Date().toISOString() },
-        { _id: 'u2', firstName: 'Admin', lastName: 'User', email: 'admin@apexarena.com', role: 'admin', createdAt: new Date().toISOString() }
-      ];
-    }
-    document.getElementById('count-users').textContent = allUsers.length;
-    renderUsers();
-  }
-
-  function renderUsers(filter = '', role = '') {
-    const tbody = document.getElementById('users-tbody');
-    let list = allUsers;
-    if (filter) list = list.filter(u => (u.firstName+' '+u.lastName+' '+u.email).toLowerCase().includes(filter.toLowerCase()));
-    if (role)   list = list.filter(u => u.role === role);
-    if (!list.length) { tbody.innerHTML = `<tr class="no-data"><td colspan="6">No users found.</td></tr>`; return; }
-    tbody.innerHTML = list.map((u, i) => `
-      <tr>
-        <td style="color:var(--muted)">${i+1}</td>
-        <td>${u.firstName} ${u.lastName}</td>
-        <td style="color:var(--muted)">${u.email}</td>
-        <td><span class="pill ${u.role==='admin'?'pill-red':'pill-blue'}">${u.role}</span></td>
-        <td style="color:var(--muted)">${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}</td>
-        <td><div class="tbl-actions">
-          <button class="tbl-btn edit" onclick="openEditUser('${u._id}')">Edit</button>
-          <button class="tbl-btn del" onclick="confirmDelete('user','${u._id}','${u.firstName} ${u.lastName}')">Delete</button>
-        </div></td>
-      </tr>`).join('');
-  }
-
-  document.getElementById('user-search').addEventListener('input', e => renderUsers(e.target.value, document.getElementById('user-filter-role').value));
-  document.getElementById('user-filter-role').addEventListener('change', e => renderUsers(document.getElementById('user-search').value, e.target.value));
-
-  function openEditUser(id) {
-    const u = allUsers.find(x => x._id === id);
-    if (!u) return;
-    document.getElementById('user-modal-title').textContent = 'Edit User';
-    document.getElementById('user-modal-id').value = id;
-    document.getElementById('um-first').value = u.firstName;
-    document.getElementById('um-last').value = u.lastName;
-    document.getElementById('um-email').value = u.email;
-    document.getElementById('um-role').value = u.role;
-    document.getElementById('user-modal').style.display = 'flex';
-  }
-
-  document.getElementById('btn-add-user').addEventListener('click', () => {
-    document.getElementById('user-modal-title').textContent = 'Add User';
-    document.getElementById('user-modal-id').value = '';
-    ['um-first','um-last','um-email'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('um-role').value = 'player';
-    document.getElementById('user-modal').style.display = 'flex';
-  });
-
-  document.getElementById('user-modal-save').addEventListener('click', async () => {
-    const id = document.getElementById('user-modal-id').value;
-    const body = { firstName: document.getElementById('um-first').value.trim(), lastName: document.getElementById('um-last').value.trim(), email: document.getElementById('um-email').value.trim(), role: document.getElementById('um-role').value };
-    if (!body.firstName || !body.lastName || !body.email) { showToast('All fields required', 'error'); return; }
-    try {
-      if (id) {
-        await apiFetch('/auth/users/' + id, { method: 'PUT', body: JSON.stringify(body) });
-        const idx = allUsers.findIndex(u => u._id === id);
-        if (idx >= 0) Object.assign(allUsers[idx], body);
-        showToast('User updated', 'success');
-      } else {
-        const created = await apiFetch('/auth/signup', { method: 'POST', body: JSON.stringify({ ...body, password: 'Temp@1234' }) });
-        allUsers.push(created.user || created);
-        showToast('User created', 'success');
-      }
-      closeModal('user-modal'); renderUsers(); document.getElementById('count-users').textContent = allUsers.length;
-    } catch(e) { showToast('Error: ' + e.message, 'error'); }
-  });
-
-  /* ── PLAYERS ── */
-  async function loadPlayers() {
-    try {
-      const data = await apiFetch('/players');
-      allPlayers = data;
-    } catch {
-      allPlayers = [];
-    }
-    document.getElementById('count-players').textContent = allPlayers.length;
-    renderPlayers();
-  }
-
-  function renderPlayers(filter = '', game = '') {
-    const tbody = document.getElementById('players-tbody');
-    let list = [...allPlayers];
-    if (filter) list = list.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()) || (p.country||'').toLowerCase().includes(filter.toLowerCase()));
-    if (game)   list = list.filter(p => p.game === game);
-    list.sort((a,b) => a.rank - b.rank);
-    if (!list.length) { tbody.innerHTML = `<tr class="no-data"><td colspan="7">No players found.</td></tr>`; return; }
-    tbody.innerHTML = list.map(p => {
-      const wr = (p.wins / (p.wins + p.losses || 1) * 100).toFixed(0);
-      return `<tr>
-        <td style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--muted)">${p.rank}</td>
-        <td><div style="display:flex;align-items:center;gap:0.6rem"><img src="${p.photo||''}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(30,144,255,0.2)" onerror="this.style.display='none'"><span>${p.name}</span></div></td>
-        <td style="color:var(--muted)">${p.country||'—'}</td>
-        <td><span class="pill pill-blue">${p.game}</span></td>
-        <td><span style="color:#4CAF50">${p.wins}</span> / <span style="color:#E53935">${p.losses}</span></td>
-        <td>${wr}%</td>
-        <td><div class="tbl-actions">
-          <button class="tbl-btn edit" onclick="openEditPlayer('${p._id}')">Edit</button>
-          <button class="tbl-btn del" onclick="confirmDelete('player','${p._id}','${p.name}')">Delete</button>
-        </div></td>
-      </tr>`;
-    }).join('');
-  }
-
-  document.getElementById('player-search').addEventListener('input', e => renderPlayers(e.target.value, document.getElementById('player-filter-game').value));
-  document.getElementById('player-filter-game').addEventListener('change', e => renderPlayers(document.getElementById('player-search').value, e.target.value));
-
-  function openEditPlayer(id) {
-    const p = allPlayers.find(x => x._id === id);
-    if (!p) return;
-    document.getElementById('player-modal-title').textContent = 'Edit Player';
-    document.getElementById('pm-id').value = id;
-    document.getElementById('pm-name').value = p.name;
-    document.getElementById('pm-country').value = p.country || '';
-    document.getElementById('pm-rank').value = p.rank;
-    document.getElementById('pm-game').value = p.game;
-    document.getElementById('pm-wins').value = p.wins;
-    document.getElementById('pm-losses').value = p.losses;
-    document.getElementById('pm-photo').value = p.photo || '';
-    document.getElementById('player-modal').style.display = 'flex';
-  }
-
-  document.getElementById('btn-add-player').addEventListener('click', () => {
-    document.getElementById('player-modal-title').textContent = 'Add Player';
-    document.getElementById('pm-id').value = '';
-    ['pm-name','pm-country','pm-photo'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('pm-rank').value = allPlayers.length + 1;
-    document.getElementById('pm-wins').value = 0;
-    document.getElementById('pm-losses').value = 0;
-    document.getElementById('player-modal').style.display = 'flex';
-  });
-
-  document.getElementById('player-modal-save').addEventListener('click', async () => {
-    const id = document.getElementById('pm-id').value;
-    const body = { name: document.getElementById('pm-name').value.trim(), country: document.getElementById('pm-country').value.trim(), rank: +document.getElementById('pm-rank').value, game: document.getElementById('pm-game').value, wins: +document.getElementById('pm-wins').value, losses: +document.getElementById('pm-losses').value, photo: document.getElementById('pm-photo').value.trim() };
-    if (!body.name) { showToast('Player name required', 'error'); return; }
-    try {
-      if (id) {
-        const updated = await apiFetch('/players/' + id, { method: 'PUT', body: JSON.stringify(body) });
-        const idx = allPlayers.findIndex(p => p._id === id);
-        if (idx >= 0) allPlayers[idx] = updated;
-        showToast('Player updated', 'success');
-      } else {
-        const created = await apiFetch('/players', { method: 'POST', body: JSON.stringify(body) });
-        allPlayers.push(created);
-        showToast('Player added', 'success');
-      }
-      closeModal('player-modal'); renderPlayers(); document.getElementById('count-players').textContent = allPlayers.length;
-    } catch(e) { showToast('Error: ' + e.message, 'error'); }
-  });
-
-  /* ── REGISTRATIONS ── */
-  async function loadRegistrations() {
-    try {
-      const data = await apiFetch('/registrations/all');
-      allRegs = data;
-    } catch {
-      allRegs = [];
-    }
-    document.getElementById('count-regs').textContent = allRegs.length;
-    renderRegs();
-  }
-
-  function renderRegs(filter = '', status = '') {
-    const tbody = document.getElementById('regs-tbody');
-    let list = [...allRegs];
-    if (filter) list = list.filter(r => (r.tournamentName + ' ' + (r.user?.email||'') + ' ' + r.inGameName).toLowerCase().includes(filter.toLowerCase()));
-    if (status) list = list.filter(r => r.status === status);
-    if (!list.length) { tbody.innerHTML = `<tr class="no-data"><td colspan="7">No registrations found.</td></tr>`; return; }
-    tbody.innerHTML = list.map(r => {
-      const playerName = r.user ? (r.user.firstName + ' ' + r.user.lastName) : (r.inGameName || '—');
-      const statusClass = r.status === 'confirmed' ? 'pill-green' : r.status === 'rejected' ? 'pill-red' : 'pill-warn';
-      const payClass = r.paymentStatus === 'paid' ? 'pill-green' : r.paymentStatus === 'refunded' ? 'pill-red' : 'pill-warn';
-      return `<tr>
-        <td>${r.tournamentName}<br><span style="color:var(--muted);font-size:0.75rem">${r.game}</span></td>
-        <td>${playerName}<br><span style="color:var(--muted);font-size:0.75rem">${r.user?.email||''}</span></td>
-        <td><span class="pill pill-blue">${r.game}</span></td>
-        <td style="color:var(--muted)">${r.region}</td>
-        <td><span class="pill ${payClass}">${r.paymentStatus}</span></td>
-        <td><span class="pill ${statusClass}">${r.status}</span></td>
-        <td><div class="tbl-actions">
-          ${r.status !== 'confirmed' ? `<button class="tbl-btn approve" onclick="updateRegStatus('${r._id}','confirmed')">Approve</button>` : ''}
-          ${r.status !== 'rejected' ? `<button class="tbl-btn del" onclick="updateRegStatus('${r._id}','rejected')">Reject</button>` : ''}
-          <button class="tbl-btn del" onclick="confirmDelete('reg','${r._id}','this registration')">Del</button>
-        </div></td>
-      </tr>`;
-    }).join('');
-  }
-
-  document.getElementById('reg-search').addEventListener('input', e => renderRegs(e.target.value, document.getElementById('reg-filter-status').value));
-  document.getElementById('reg-filter-status').addEventListener('change', e => renderRegs(document.getElementById('reg-search').value, e.target.value));
-
-  async function updateRegStatus(id, status) {
-    try {
-      await apiFetch('/registrations/' + id + '/status', { method: 'PUT', body: JSON.stringify({ status }) });
-      const idx = allRegs.findIndex(r => r._id === id);
-      if (idx >= 0) allRegs[idx].status = status;
-      renderRegs(); showToast('Registration ' + status, 'success');
-    } catch(e) {
-      // Local update only if API not available
-      const idx = allRegs.findIndex(r => r._id === id);
-      if (idx >= 0) { allRegs[idx].status = status; renderRegs(); showToast('Registration ' + status + ' (local)', 'success'); }
-    }
-  }
-
-  /* ── OVERVIEW ── */
-  function renderOverview() {
-    const pending = allRegs.filter(r => r.status === 'pending').length;
-    const paid    = allRegs.filter(r => r.paymentStatus === 'paid').length;
-    document.getElementById('overview-stats').innerHTML = `
-      <div class="stat-card"><div class="stat-num">${allUsers.length}</div><div class="stat-label">Total Users</div></div>
-      <div class="stat-card green"><div class="stat-num">${allPlayers.length}</div><div class="stat-label">Players</div></div>
-      <div class="stat-card warn"><div class="stat-num">${allRegs.length}</div><div class="stat-label">Registrations</div></div>
-      <div class="stat-card red"><div class="stat-num">${pending}</div><div class="stat-label">Pending Approvals</div></div>
-      <div class="stat-card green"><div class="stat-num">${paid}</div><div class="stat-label">Paid Entries</div></div>
-    `;
-    document.getElementById('recent-regs').innerHTML = allRegs.slice(0,5).map(r =>
-      `<div style="padding:0.75rem;background:var(--dark3);border:1px solid rgba(30,144,255,0.08);margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center">
-        <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:0.9rem">${r.tournamentName}</div><div style="font-size:0.75rem;color:var(--muted)">${r.game} · ${r.region}</div></div>
-        <span class="pill ${r.status==='confirmed'?'pill-green':r.status==='rejected'?'pill-red':'pill-warn'}">${r.status}</span>
-      </div>`).join('') || '<div style="color:var(--muted);text-align:center;padding:2rem">No registrations yet</div>';
-    document.getElementById('recent-users').innerHTML = allUsers.slice(0,5).map(u =>
-      `<div style="padding:0.75rem;background:var(--dark3);border:1px solid rgba(30,144,255,0.08);margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center">
-        <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:0.9rem">${u.firstName} ${u.lastName}</div><div style="font-size:0.75rem;color:var(--muted)">${u.email}</div></div>
-        <span class="pill ${u.role==='admin'?'pill-red':'pill-blue'}">${u.role}</span>
-      </div>`).join('') || '<div style="color:var(--muted);text-align:center;padding:2rem">No users yet</div>';
-  }
-
-  /* ── DELETE ── */
-  let pendingDelete = null;
-  function confirmDelete(type, id, name) {
-    document.getElementById('confirm-text').textContent = `Delete "${name}"?`;
-    pendingDelete = { type, id };
-    document.getElementById('confirm-modal').style.display = 'flex';
-  }
-
-  document.getElementById('confirm-yes').addEventListener('click', async () => {
-    if (!pendingDelete) return;
-    const { type, id } = pendingDelete;
-    closeModal('confirm-modal');
-    try {
-      if (type === 'user') {
-        await apiFetch('/auth/users/' + id, { method: 'DELETE' });
-        allUsers = allUsers.filter(u => u._id !== id); renderUsers(); document.getElementById('count-users').textContent = allUsers.length;
-      } else if (type === 'player') {
-        await apiFetch('/players/' + id, { method: 'DELETE' });
-        allPlayers = allPlayers.filter(p => p._id !== id); renderPlayers(); document.getElementById('count-players').textContent = allPlayers.length;
-      } else if (type === 'reg') {
-        await apiFetch('/registrations/' + id, { method: 'DELETE' });
-        allRegs = allRegs.filter(r => r._id !== id); renderRegs(); document.getElementById('count-regs').textContent = allRegs.length;
-      }
-      showToast('Deleted successfully', 'success');
-      renderOverview();
-    } catch(e) {
-      // Local removal
-      if (type === 'user') { allUsers = allUsers.filter(u => u._id !== id); renderUsers(); }
-      else if (type === 'player') { allPlayers = allPlayers.filter(p => p._id !== id); renderPlayers(); }
-      else if (type === 'reg') { allRegs = allRegs.filter(r => r._id !== id); renderRegs(); }
-      showToast('Removed (local only — add admin API routes)', 'success');
-      renderOverview();
-    }
-    pendingDelete = null;
-  });
-
-  /* ── MODAL ── */
-  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-  document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.style.display = 'none'; });
-  });
-
-  /* ── TOAST ── */
-  let toastTimer;
-  function showToast(msg, type = '') {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'toast show ' + type;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
-  }
-
-  init();
-</script>
-</body>
-</html>
