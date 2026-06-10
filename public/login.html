@@ -635,9 +635,13 @@
       document.getElementById('successOverlay').classList.add('show');
       document.getElementById('successName').textContent = data.user.firstName || 'Champion';
 
-      // Redirect after 1.8s — admins go to admin panel
+      // Redirect after 1.8s — go back to previous page if set, else default
       setTimeout(() => {
-        if (data.user.role === 'admin') {
+        const returnTo = localStorage.getItem('apexReturnTo');
+        localStorage.removeItem('apexReturnTo');
+        if (returnTo) {
+          location.href = returnTo;
+        } else if (data.user.role === 'admin') {
           location.href = 'admin.html';
         } else {
           location.href = 'profile.html';

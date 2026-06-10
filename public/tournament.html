@@ -102,7 +102,7 @@
   .pay-tab:hover:not(.active) { background: rgba(30,144,255,0.05); color: #ccc; }
 
   /* CARD PREVIEW */
-  .card-preview { background: linear-gradient(135deg, #0D1F3C 0%, #1E3A5F 50%, #0A1628 100%); border: 1px solid rgba(30,144,255,0.3); border-radius: 12px; padding: 1.5rem; position: relative; overflow: hidden; height: 170px; }
+  .card-preview { background: linear-gradient(135deg, #0D1F3C 0%, #1E3A5F 50%, #0A1628 100%); border: 1px solid rgba(30,144,255,0.3); border-radius: 12px; padding: 1.5rem; position: relative; overflow: hidden; min-height: 185px; }
   .card-preview::before { content: ''; position: absolute; top: -50%; right: -20%; width: 200px; height: 200px; background: rgba(30,144,255,0.08); border-radius: 50%; }
   .card-preview::after { content: ''; position: absolute; bottom: -30%; left: -10%; width: 150px; height: 150px; background: rgba(30,144,255,0.05); border-radius: 50%; }
   .card-type { font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem; }
@@ -633,47 +633,67 @@
 
     const token = localStorage.getItem('apexToken');
 
-    if (token) {
-      try {
-        const res = await fetch('/registrations', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-          body: JSON.stringify({
-            tournamentName: 'APEX ARENA World Championship 2026',
-            tournamentId:   'tournament_wc_2026',
-            game:           'Valorant',
-            inGameName:     gameId,
-            teamName:       teamName,
-            region:         'Global',
-            entryFee:       '0.05 ETH',
-            paymentStatus:  'paid',
-            txHash:         txHash
-          })
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          showAlert('error', '✕ ' + (data.error || 'Registration failed.'));
-          btn.textContent = '⚔ Register for Tournament';
-          btn.disabled = false;
-          return;
-        }
-      } catch(err) {
-        // Server unreachable — continue with local save
-      }
+    if (!token) {
+      // Not logged in — save pending reg to localStorage and redirect to login
+      localStorage.setItem('apexReturnTo', 'tournament.html');
+      localStorage.setItem('apexPendingReg', JSON.stringify({ playerName, gameId, teamName, txHash }));
+      btn.textContent = '⚔ Register for Tournament';
+      btn.disabled = false;
+      showAlert('error', '⚠ You must be logged in to complete registration. Redirecting to login…');
+      setTimeout(() => { location.href = 'login.html'; }, 2000);
+      pendingReg = {};
+      return;
     }
 
-    const player = { name: playerName, gameId: gameId, team: teamName };
-    participants.push(player);
-    localStorage.setItem('apexParticipants', JSON.stringify(participants));
+    try {
+      const res = await fetch('/registrations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({
+          tournamentName: 'APEX ARENA World Championship 2026',
+          tournamentId:   'tournament_wc_2026',
+          game:           'Valorant',
+          inGameName:     gameId,
+          teamName:       teamName,
+          region:         'Global',
+          entryFee:       '0.05 ETH',
+          paymentStatus:  'paid',
+          txHash:         txHash
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showAlert('error', '✕ ' + (data.error || 'Registration failed. You may already be registered.'));
+        btn.textContent = '⚔ Register for Tournament';
+        btn.disabled = false;
+        return;
+      }
 
-    document.getElementById('registrationForm').reset();
-    btn.textContent = '⚔ Register for Tournament';
-    btn.disabled = false;
+      // ✅ SUCCESS — saved to DB
+      const player = { name: playerName, gameId: gameId, team: teamName };
+      participants.push(player);
+      localStorage.setItem('apexParticipants', JSON.stringify(participants));
+      document.getElementById('registrationForm').reset();
+      btn.textContent = '⚔ Register for Tournament';
+      btn.disabled = false;
+      showAlert('success', '✓ Payment confirmed! ' + playerName + ' registered and saved to database. TX: ' + txHash.substring(0,18) + '…');
+      renderList();
+      updateSlots();
+      pendingReg = {};
 
-    showAlert('success', '✓ Payment confirmed! ' + playerName + ' registered successfully.' + (token ? ' Saved to database.' : ' (Log in to save permanently)'));
-    renderList();
-    updateSlots();
-    pendingReg = {};
+    } catch(err) {
+      // Network error fallback
+      const player = { name: playerName, gameId: gameId, team: teamName };
+      participants.push(player);
+      localStorage.setItem('apexParticipants', JSON.stringify(participants));
+      document.getElementById('registrationForm').reset();
+      btn.textContent = '⚔ Register for Tournament';
+      btn.disabled = false;
+      showAlert('success', '✓ ' + playerName + ' registered locally. (Server unreachable — login and retry to save to DB)');
+      renderList();
+      updateSlots();
+      pendingReg = {};
+    }
   }
 
   // ── RENDER LIST ──
