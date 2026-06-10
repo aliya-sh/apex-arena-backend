@@ -430,6 +430,9 @@
     <!-- ALERT BOX -->
     <div class="alert-box" id="alertBox"></div>
 
+    <!-- LOGIN STATUS BANNER -->
+    <div id="login-status-banner" style="display:none;margin-bottom:1rem;padding:0.75rem 1rem;font-family:'Barlow Condensed',sans-serif;font-size:0.88rem;letter-spacing:0.06em;border:1px solid;align-items:center;gap:0.5rem;border-radius:2px"></div>
+
     <!-- FORM -->
     <form id="registrationForm" novalidate>
 
@@ -495,6 +498,29 @@
 
   // Load from localStorage
   let participants = JSON.parse(localStorage.getItem('apexParticipants')) || [];
+
+  // ── LOAD PARTICIPANTS FROM DATABASE ──
+  async function loadParticipantsFromDB() {
+    try {
+      const res = await fetch('/registrations/all-public');
+      if (res.ok) {
+        const data = await res.json();
+        // Merge DB registrations into participants list
+        data.forEach(reg => {
+          const exists = participants.find(p => p.gameId === reg.inGameName);
+          if (!exists) {
+            participants.push({ name: reg.inGameName, gameId: reg.inGameName, team: reg.teamName || '—' });
+          }
+        });
+        localStorage.setItem('apexParticipants', JSON.stringify(participants));
+        renderList();
+        updateSlots();
+      }
+    } catch(e) {
+      // Fallback to localStorage only
+    }
+  }
+  loadParticipantsFromDB();
 
   // On page load
   renderList();
