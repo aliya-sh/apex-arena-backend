@@ -81,9 +81,9 @@
   .btn-register:active { transform: translateY(0); }
   .btn-register:disabled { background: rgba(30,144,255,0.3); color: rgba(10,10,10,0.5); cursor: not-allowed; transform: none; }
   /* ── PAYMENT MODAL ── */
-  .pay-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 500; display: none; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(8px); }
+  .pay-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 500; display: none; align-items: flex-start; justify-content: center; padding: 1rem; backdrop-filter: blur(8px); overflow-y: auto; }
   .pay-overlay.open { display: flex; }
-  .pay-modal { background: #080D1A; border: 1px solid rgba(30,144,255,0.25); width: 100%; max-width: 820px; position: relative; overflow: hidden; border-radius: 2px; }
+  .pay-modal { background: #080D1A; border: 1px solid rgba(30,144,255,0.25); width: 100%; max-width: 820px; position: relative; overflow: hidden; border-radius: 2px; margin: auto; }
   .pay-modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #1E90FF, #0055CC, #1E90FF); background-size: 200%; animation: shimmer 2s linear infinite; }
   @keyframes shimmer { 0%{background-position:0%} 100%{background-position:200%} }
   .pay-modal-inner { display: grid; grid-template-columns: 1fr 1fr; min-height: 520px; }
@@ -568,6 +568,16 @@
     }
 
     pendingReg = { playerName, gameId, teamName };
+
+    // ── CHECK LOGIN BEFORE OPENING PAYMENT ──
+    const token = localStorage.getItem('apexToken');
+    if (!token) {
+      localStorage.setItem('apexReturnTo', 'tournament.html');
+      localStorage.setItem('apexPendingFormData', JSON.stringify({ playerName, gameId, teamName }));
+      showAlert('error', '⚠ Please log in first to register. Redirecting to login…');
+      setTimeout(() => { location.href = 'login.html'; }, 2000);
+      return;
+    }
 
     // Reset modal to step 1
     document.getElementById('payStep1').style.display = 'grid';
