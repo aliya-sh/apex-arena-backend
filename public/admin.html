@@ -330,3 +330,369 @@
   </main>
 </div>
 </div>
+<!-- MODAL: Edit/Add User -->
+<div class="modal-overlay" id="user-modal" style="display:none">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('user-modal')">✕</button>
+    <div class="modal-title" id="user-modal-title">Edit User</div>
+    <input type="hidden" id="user-modal-id">
+    <div class="modal-field"><label>First Name</label><input type="text" id="um-first"></div>
+    <div class="modal-field"><label>Last Name</label><input type="text" id="um-last"></div>
+    <div class="modal-field"><label>Email</label><input type="email" id="um-email"></div>
+    <div class="modal-field"><label>Role</label><select id="um-role"><option value="player">Player</option><option value="admin">Admin</option></select></div>
+    <div class="modal-footer">
+      <button class="action-btn btn-red" onclick="closeModal('user-modal')">Cancel</button>
+      <button class="action-btn btn-green" id="user-modal-save">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Edit/Add Player -->
+<div class="modal-overlay" id="player-modal" style="display:none">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('player-modal')">✕</button>
+    <div class="modal-title" id="player-modal-title">Add Player</div>
+    <input type="hidden" id="pm-id">
+    <div class="modal-field"><label>Name</label><input type="text" id="pm-name"></div>
+    <div class="modal-field"><label>Country (emoji + name)</label><input type="text" id="pm-country" placeholder="🇵🇰 Pakistan"></div>
+    <div class="modal-field" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div><label>Rank</label><input type="number" id="pm-rank" min="1"></div>
+      <div><label>Game</label><select id="pm-game"><option>Valorant</option><option>CS2</option><option>League of Legends</option><option>Apex Legends</option></select></div>
+    </div>
+    <div class="modal-field" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div><label>Wins</label><input type="number" id="pm-wins" min="0"></div>
+      <div><label>Losses</label><input type="number" id="pm-losses" min="0"></div>
+    </div>
+    <div class="modal-field"><label>Photo URL</label><input type="text" id="pm-photo" placeholder="https://…"></div>
+    <div class="modal-footer">
+      <button class="action-btn btn-red" onclick="closeModal('player-modal')">Cancel</button>
+      <button class="action-btn btn-green" id="player-modal-save">Save Player</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE MODAL -->
+<div class="modal-overlay" id="confirm-modal" style="display:none">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-title" style="color:var(--red)">Confirm Delete</div>
+    <p class="confirm-text" id="confirm-text">Are you sure?</p>
+    <p class="confirm-sub">This action cannot be undone.</p>
+    <div class="modal-footer">
+      <button class="action-btn btn-blue" onclick="closeModal('confirm-modal')">Cancel</button>
+      <button class="action-btn btn-red" id="confirm-yes">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  const token = localStorage.getItem('apexToken');
+  let userData = null;
+  try { userData = JSON.parse(localStorage.getItem('apexUser')); } catch {}
+
+  async function init() {
+    if (!token) { showGate('Login required'); return; }
+    try {
+      const res = await fetch('/auth/me', { headers: { Authorization: 'Bearer ' + token } });
+      if (!res.ok) throw new Error();
+      const user = await res.json();
+      if (user.role !== 'admin') { showGate('Admin access required. Your account role is: ' + user.role); return; }
+      userData = user;
+      document.getElementById('admin-name').textContent = user.firstName + ' ' + user.lastName;
+      document.getElementById('admin-interface').style.display = 'block';
+      loadAll();
+    } catch {
+      if (userData && userData.role === 'admin') {
+        document.getElementById('admin-interface').style.display = 'block';
+        document.getElementById('admin-name').textContent = userData.firstName + ' ' + userData.lastName;
+        loadAll();
+      } else {
+        showGate('Could not verify admin access. Please log in again.');
+      }
+    }
+  }
+
+  function showGate(msg) {
+    document.getElementById('auth-gate').style.display = 'block';
+    document.querySelector('.gate-text').textContent = msg;
+  }
+
+  document.getElementById('logout-btn').addEventListener('click', () => {
+    localStorage.removeItem('apexToken'); localStorage.removeItem('apexUser');
+    location.href = 'login.html';
+  });
+
+  document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+      item.classList.add('active');
+      document.getElementById('tab-' + item.dataset.tab).classList.add('active');
+    });
+  });
+
+  let allUsers = [], allPlayers = [], allRegs = [];
+
+  async function loadAll() {
+    await Promise.all([loadUsers(), loadPlayers(), loadRegistrations()]);
+    renderOverview();
+  }
+
+  async function apiFetch(url, opts = {}) {
+    const res = await fetch(url, { ...opts, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token, ...(opts.headers || {}) } });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  }
+
+  async function loadUsers() {
+    try { allUsers = await apiFetch('/auth/users'); }
+    catch { allUsers = [{ _id: 'u1', firstName: userData?.firstName||'Admin', lastName: userData?.lastName||'User', email: userData?.email||'', role: 'admin', createdAt: new Date().toISOString() }]; }
+    document.getElementById('count-users').textContent = allUsers.length;
+    renderUsers();
+  }
+
+  function renderUsers(filter='', role='') {
+    const tbody = document.getElementById('users-tbody');
+    let list = allUsers;
+    if (filter) list = list.filter(u => (u.firstName+' '+u.lastName+' '+u.email).toLowerCase().includes(filter.toLowerCase()));
+    if (role) list = list.filter(u => u.role === role);
+    if (!list.length) { tbody.innerHTML = `<tr class="no-data"><td colspan="6">No users found.</td></tr>`; return; }
+    tbody.innerHTML = list.map((u,i) => `<tr>
+      <td style="color:var(--muted)">${i+1}</td>
+      <td>${u.firstName} ${u.lastName}</td>
+      <td style="color:var(--muted)">${u.email}</td>
+      <td><span class="pill ${u.role==='admin'?'pill-red':'pill-blue'}">${u.role}</span></td>
+      <td style="color:var(--muted)">${u.createdAt?new Date(u.createdAt).toLocaleDateString():'—'}</td>
+      <td><div class="tbl-actions">
+        <button class="tbl-btn edit" onclick="openEditUser('${u._id}')">Edit</button>
+        <button class="tbl-btn del" onclick="confirmDelete('user','${u._id}','${u.firstName} ${u.lastName}')">Delete</button>
+      </div></td>
+    </tr>`).join('');
+  }
+
+  document.getElementById('user-search').addEventListener('input', e => renderUsers(e.target.value, document.getElementById('user-filter-role').value));
+  document.getElementById('user-filter-role').addEventListener('change', e => renderUsers(document.getElementById('user-search').value, e.target.value));
+
+  function openEditUser(id) {
+    const u = allUsers.find(x => x._id === id); if (!u) return;
+    document.getElementById('user-modal-title').textContent = 'Edit User';
+    document.getElementById('user-modal-id').value = id;
+    document.getElementById('um-first').value = u.firstName;
+    document.getElementById('um-last').value = u.lastName;
+    document.getElementById('um-email').value = u.email;
+    document.getElementById('um-role').value = u.role;
+    document.getElementById('user-modal').style.display = 'flex';
+  }
+
+  document.getElementById('btn-add-user').addEventListener('click', () => {
+    document.getElementById('user-modal-title').textContent = 'Add User';
+    document.getElementById('user-modal-id').value = '';
+    ['um-first','um-last','um-email'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('um-role').value = 'player';
+    document.getElementById('user-modal').style.display = 'flex';
+  });
+
+  document.getElementById('user-modal-save').addEventListener('click', async () => {
+    const id = document.getElementById('user-modal-id').value;
+    const body = { firstName: document.getElementById('um-first').value.trim(), lastName: document.getElementById('um-last').value.trim(), email: document.getElementById('um-email').value.trim(), role: document.getElementById('um-role').value };
+    if (!body.firstName || !body.lastName || !body.email) { showToast('All fields required','error'); return; }
+    try {
+      if (id) {
+        await apiFetch('/auth/users/'+id, { method:'PUT', body:JSON.stringify(body) });
+        const idx = allUsers.findIndex(u=>u._id===id);
+        if (idx>=0) Object.assign(allUsers[idx], body);
+        showToast('User updated','success');
+      } else {
+        const created = await apiFetch('/auth/signup', { method:'POST', body:JSON.stringify({...body,password:'Temp@1234'}) });
+        allUsers.push(created.user||created);
+        showToast('User created','success');
+      }
+      closeModal('user-modal'); renderUsers(); document.getElementById('count-users').textContent = allUsers.length;
+    } catch(e) { showToast('Error: '+e.message,'error'); }
+  });
+
+  async function loadPlayers() {
+    try { allPlayers = await apiFetch('/players'); } catch { allPlayers = []; }
+    document.getElementById('count-players').textContent = allPlayers.length;
+    renderPlayers();
+  }
+
+  function renderPlayers(filter='', game='') {
+    const tbody = document.getElementById('players-tbody');
+    let list = [...allPlayers];
+    if (filter) list = list.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()) || (p.country||'').toLowerCase().includes(filter.toLowerCase()));
+    if (game) list = list.filter(p => p.game === game);
+    list.sort((a,b) => a.rank-b.rank);
+    if (!list.length) { tbody.innerHTML = `<tr class="no-data"><td colspan="7">No players found.</td></tr>`; return; }
+    tbody.innerHTML = list.map(p => {
+      const wr = (p.wins/(p.wins+p.losses||1)*100).toFixed(0);
+      return `<tr>
+        <td style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--muted)">${p.rank}</td>
+        <td><div style="display:flex;align-items:center;gap:0.6rem"><img src="${p.photo||''}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(30,144,255,0.2)" onerror="this.style.display='none'"><span>${p.name}</span></div></td>
+        <td style="color:var(--muted)">${p.country||'—'}</td>
+        <td><span class="pill pill-blue">${p.game}</span></td>
+        <td><span style="color:#4CAF50">${p.wins}</span> / <span style="color:#E53935">${p.losses}</span></td>
+        <td>${wr}%</td>
+        <td><div class="tbl-actions">
+          <button class="tbl-btn edit" onclick="openEditPlayer('${p._id}')">Edit</button>
+          <button class="tbl-btn del" onclick="confirmDelete('player','${p._id}','${p.name}')">Delete</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  document.getElementById('player-search').addEventListener('input', e => renderPlayers(e.target.value, document.getElementById('player-filter-game').value));
+  document.getElementById('player-filter-game').addEventListener('change', e => renderPlayers(document.getElementById('player-search').value, e.target.value));
+
+  function openEditPlayer(id) {
+    const p = allPlayers.find(x=>x._id===id); if (!p) return;
+    document.getElementById('player-modal-title').textContent = 'Edit Player';
+    document.getElementById('pm-id').value = id;
+    document.getElementById('pm-name').value = p.name;
+    document.getElementById('pm-country').value = p.country||'';
+    document.getElementById('pm-rank').value = p.rank;
+    document.getElementById('pm-game').value = p.game;
+    document.getElementById('pm-wins').value = p.wins;
+    document.getElementById('pm-losses').value = p.losses;
+    document.getElementById('pm-photo').value = p.photo||'';
+    document.getElementById('player-modal').style.display = 'flex';
+  }
+
+  document.getElementById('btn-add-player').addEventListener('click', () => {
+    document.getElementById('player-modal-title').textContent = 'Add Player';
+    document.getElementById('pm-id').value = '';
+    ['pm-name','pm-country','pm-photo'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('pm-rank').value = allPlayers.length+1;
+    document.getElementById('pm-wins').value = 0;
+    document.getElementById('pm-losses').value = 0;
+    document.getElementById('player-modal').style.display = 'flex';
+  });
+
+  document.getElementById('player-modal-save').addEventListener('click', async () => {
+    const id = document.getElementById('pm-id').value;
+    const body = { name:document.getElementById('pm-name').value.trim(), country:document.getElementById('pm-country').value.trim(), rank:+document.getElementById('pm-rank').value, game:document.getElementById('pm-game').value, wins:+document.getElementById('pm-wins').value, losses:+document.getElementById('pm-losses').value, photo:document.getElementById('pm-photo').value.trim() };
+    if (!body.name) { showToast('Player name required','error'); return; }
+    try {
+      if (id) {
+        const updated = await apiFetch('/players/'+id, { method:'PUT', body:JSON.stringify(body) });
+        const idx = allPlayers.findIndex(p=>p._id===id);
+        if (idx>=0) allPlayers[idx] = updated;
+        showToast('Player updated','success');
+      } else {
+        const created = await apiFetch('/players', { method:'POST', body:JSON.stringify(body) });
+        allPlayers.push(created);
+        showToast('Player added','success');
+      }
+      closeModal('player-modal'); renderPlayers(); document.getElementById('count-players').textContent = allPlayers.length;
+    } catch(e) { showToast('Error: '+e.message,'error'); }
+  });
+
+  async function loadRegistrations() {
+    try { allRegs = await apiFetch('/registrations/all'); } catch { allRegs = []; }
+    document.getElementById('count-regs').textContent = allRegs.length;
+    renderRegs();
+  }
+
+  function renderRegs(filter='', status='') {
+    const tbody = document.getElementById('regs-tbody');
+    let list = [...allRegs];
+    if (filter) list = list.filter(r => (r.tournamentName+' '+(r.user?.email||'')+' '+r.inGameName).toLowerCase().includes(filter.toLowerCase()));
+    if (status) list = list.filter(r => r.status===status);
+    if (!list.length) { tbody.innerHTML = `<tr class="no-data"><td colspan="7">No registrations found.</td></tr>`; return; }
+    tbody.innerHTML = list.map(r => {
+      const playerName = r.user ? (r.user.firstName+' '+r.user.lastName) : (r.inGameName||'—');
+      const statusClass = r.status==='confirmed'?'pill-green':r.status==='rejected'?'pill-red':'pill-warn';
+      const payClass = r.paymentStatus==='paid'?'pill-green':r.paymentStatus==='refunded'?'pill-red':'pill-warn';
+      return `<tr>
+        <td>${r.tournamentName}<br><span style="color:var(--muted);font-size:0.75rem">${r.game}</span></td>
+        <td>${playerName}<br><span style="color:var(--muted);font-size:0.75rem">${r.user?.email||''}</span></td>
+        <td><span class="pill pill-blue">${r.game}</span></td>
+        <td style="color:var(--muted)">${r.region}</td>
+        <td><span class="pill ${payClass}">${r.paymentStatus}</span></td>
+        <td><span class="pill ${statusClass}">${r.status}</span></td>
+        <td><div class="tbl-actions">
+          ${r.status!=='confirmed'?`<button class="tbl-btn approve" onclick="updateRegStatus('${r._id}','confirmed')">Approve</button>`:''}
+          ${r.status!=='rejected'?`<button class="tbl-btn del" onclick="updateRegStatus('${r._id}','rejected')">Reject</button>`:''}
+          <button class="tbl-btn del" onclick="confirmDelete('reg','${r._id}','this registration')">Del</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  document.getElementById('reg-search').addEventListener('input', e => renderRegs(e.target.value, document.getElementById('reg-filter-status').value));
+  document.getElementById('reg-filter-status').addEventListener('change', e => renderRegs(document.getElementById('reg-search').value, e.target.value));
+
+  async function updateRegStatus(id, status) {
+    try {
+      await apiFetch('/registrations/'+id+'/status', { method:'PUT', body:JSON.stringify({status}) });
+      const idx = allRegs.findIndex(r=>r._id===id);
+      if (idx>=0) allRegs[idx].status = status;
+      renderRegs(); showToast('Registration '+status,'success');
+    } catch { showToast('Updated locally only','success'); }
+  }
+
+  function renderOverview() {
+    const pending = allRegs.filter(r=>r.status==='pending').length;
+    const paid = allRegs.filter(r=>r.paymentStatus==='paid').length;
+    document.getElementById('overview-stats').innerHTML = `
+      <div class="stat-card"><div class="stat-num">${allUsers.length}</div><div class="stat-label">Total Users</div></div>
+      <div class="stat-card green"><div class="stat-num">${allPlayers.length}</div><div class="stat-label">Players</div></div>
+      <div class="stat-card warn"><div class="stat-num">${allRegs.length}</div><div class="stat-label">Registrations</div></div>
+      <div class="stat-card red"><div class="stat-num">${pending}</div><div class="stat-label">Pending Approvals</div></div>
+      <div class="stat-card green"><div class="stat-num">${paid}</div><div class="stat-label">Paid Entries</div></div>`;
+    document.getElementById('recent-regs').innerHTML = allRegs.slice(0,5).map(r =>
+      `<div style="padding:0.75rem;background:var(--dark3);border:1px solid rgba(30,144,255,0.08);margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:0.9rem">${r.tournamentName}</div><div style="font-size:0.75rem;color:var(--muted)">${r.game} · ${r.region}</div></div>
+        <span class="pill ${r.status==='confirmed'?'pill-green':r.status==='rejected'?'pill-red':'pill-warn'}">${r.status}</span>
+      </div>`).join('') || '<div style="color:var(--muted);text-align:center;padding:2rem">No registrations yet</div>';
+    document.getElementById('recent-users').innerHTML = allUsers.slice(0,5).map(u =>
+      `<div style="padding:0.75rem;background:var(--dark3);border:1px solid rgba(30,144,255,0.08);margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:0.9rem">${u.firstName} ${u.lastName}</div><div style="font-size:0.75rem;color:var(--muted)">${u.email}</div></div>
+        <span class="pill ${u.role==='admin'?'pill-red':'pill-blue'}">${u.role}</span>
+      </div>`).join('') || '<div style="color:var(--muted);text-align:center;padding:2rem">No users yet</div>';
+  }
+
+  let pendingDelete = null;
+  function confirmDelete(type, id, name) {
+    document.getElementById('confirm-text').textContent = `Delete "${name}"?`;
+    pendingDelete = { type, id };
+    document.getElementById('confirm-modal').style.display = 'flex';
+  }
+
+  document.getElementById('confirm-yes').addEventListener('click', async () => {
+    if (!pendingDelete) return;
+    const { type, id } = pendingDelete;
+    closeModal('confirm-modal');
+    try {
+      if (type==='user') { await apiFetch('/auth/users/'+id,{method:'DELETE'}); allUsers=allUsers.filter(u=>u._id!==id); renderUsers(); document.getElementById('count-users').textContent=allUsers.length; }
+      else if (type==='player') { await apiFetch('/players/'+id,{method:'DELETE'}); allPlayers=allPlayers.filter(p=>p._id!==id); renderPlayers(); document.getElementById('count-players').textContent=allPlayers.length; }
+      else if (type==='reg') { await apiFetch('/registrations/'+id,{method:'DELETE'}); allRegs=allRegs.filter(r=>r._id!==id); renderRegs(); document.getElementById('count-regs').textContent=allRegs.length; }
+      showToast('Deleted successfully','success'); renderOverview();
+    } catch {
+      if (type==='user') { allUsers=allUsers.filter(u=>u._id!==id); renderUsers(); }
+      else if (type==='player') { allPlayers=allPlayers.filter(p=>p._id!==id); renderPlayers(); }
+      else if (type==='reg') { allRegs=allRegs.filter(r=>r._id!==id); renderRegs(); }
+      showToast('Removed locally','success'); renderOverview();
+    }
+    pendingDelete = null;
+  });
+
+  function closeModal(id) { document.getElementById(id).style.display='none'; }
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => { if (e.target===overlay) overlay.style.display='none'; });
+  });
+
+  let toastTimer;
+  function showToast(msg, type='') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast show '+type;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  init();
+</script>
+</body>
+</html>
