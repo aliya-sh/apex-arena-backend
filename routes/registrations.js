@@ -8,9 +8,6 @@ router.post('/', auth, async (req, res) => {
   try {
     const { tournamentName, tournamentId, game, teamName, inGameName, region, entryFee, txHash } = req.body;
 
-    const exists = await Registration.findOne({ user: req.userId, tournamentId });
-    if (exists) return res.status(409).json({ error: 'Already registered for this tournament' });
-
     const reg = await Registration.create({
       user: req.userId,
       tournamentName, tournamentId, game,
@@ -36,7 +33,20 @@ router.get('/mine', auth, async (req, res) => {
   }
 });
 
-// ── GET /registrations/all  (admin — all registrations) — MUST be before /:tournamentId
+// ── GET /registrations/all-public  — public list for tournament page (no auth needed)
+router.get('/all-public', async (req, res) => {
+  try {
+    const regs = await Registration.find({ status: { $ne: 'rejected' } })
+      .select('inGameName teamName game status createdAt')
+      .sort({ createdAt: -1 })
+      .limit(50);
+    res.json(regs);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /registrations/all  (admin — all registrations) — MUST be before /:id
 router.get('/all', auth, async (req, res) => {
   try {
     const regs = await Registration.find()
